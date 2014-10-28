@@ -10,13 +10,17 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+import os, sys
 from os.path import join, dirname
 
 from configurations import Configuration, values
 
-BASE_DIR = dirname(dirname(__file__))
+BASE_DIR     = dirname(dirname(__file__))
+PROJECT_ROOT = os.path.join(BASE_DIR,"SocialLearning")
+APPS_ROOT    = os.path.join(BASE_DIR, 'apps')
 
+sys.path.insert(0, PROJECT_ROOT)
+sys.path.insert(0, APPS_ROOT)
 
 class Common(Configuration):
 
@@ -37,6 +41,7 @@ class Common(Configuration):
         'django.contrib.admin',
     )
     THIRD_PARTY_APPS = (
+        'suit',
         'crispy_forms',  # Form layouts
         'avatar',  # for user avatars
         'allauth',  # registration
@@ -86,7 +91,7 @@ class Common(Configuration):
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
     # Note: This key only used for development and testing.
     #       In production, this is changed to a values.SecretValue() setting
-    SECRET_KEY = "CHANGEME!!!"
+    SECRET_KEY = 'l2gp7#914p!91#bb7t^dxj0ol2-0_6ubn@o3wj(np6w8hzoky-'
     # END SECRET CONFIGURATION
 
     # FIXTURE CONFIGURATION
@@ -112,7 +117,7 @@ class Common(Configuration):
 
     # DATABASE CONFIGURATION
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-    DATABASES = values.DatabaseURLValue('postgres://localhost/SocialLearning')
+    DATABASES = values.DatabaseURLValue('postgres://alabarga:postgres@localhost/SocialLearning')
     # END DATABASE CONFIGURATION
 
     # CACHING

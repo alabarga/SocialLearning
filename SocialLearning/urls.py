@@ -30,4 +30,9 @@ urlpatterns = patterns('',
 
     # Your stuff: custom urls go here
 
+    # Uncomment the next line to enable avatars
+    url(r'^avatar/', include('avatar.urls')),
+
+    url(r'^k/', include('learningobjects.urls')),
+
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
