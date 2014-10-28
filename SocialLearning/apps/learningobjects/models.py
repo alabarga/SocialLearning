@@ -28,11 +28,13 @@ class SocialNetwork(models.Model):
         return self.name
 
 class Resource(models.Model):
+    pk = models.CharField(max_length=20,null=True, blank=True)
     title = models.CharField(max_length=255)
     url = URLField()
     category = models.CharField(max_length=255)
-    descripcion = RedactorField(null=True, blank=True)    
+    description = RedactorField(null=True, blank=True)    
     seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name="resources")
+    last_processed = models.DateTimeField(null=True, blank=True, through='Mention')
 
     def __unicode__(self):
         return self.title
