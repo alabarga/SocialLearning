@@ -3,6 +3,8 @@ import sha
 import xml.etree.ElementTree as ET
 import unfurl
 import urllib2
+import json
+import time
 
 class SearchEngine(object):
 
@@ -21,16 +23,15 @@ class SearchEngine(object):
 
 class Google(SearchEngine):
     def __init__(self):
-        super(DuckDuckGo, self).__init__("google")
+        super(Google, self).__init__("google")
 
     #Busca en google con los parametros que se pasen
-    def search(query):
+    def search(self,query):
         links=[]        
 
         SEARCH_ENGINE_ID = '009363772985848074726:jxffracj2_8' #os.environ['SEARCH_ENGINE_ID']                          
         API_KEY = 'AIzaSyCE9D6fjIW86IN2uekwJbaS3TDfNbim-lE' #os.environ['GOOGLE_CLOUD_API_KEY']
         googleApi = GoogleCustomSearch(SEARCH_ENGINE_ID, API_KEY)
-
         for result in googleApi.search(query):
           link=result['link']
           if link not in links:
@@ -41,12 +42,12 @@ class Google(SearchEngine):
 class DuckDuckGoIO(SearchEngine):
 
     def __init__(self):
-        super(DuckDuckGo, self).__init__("duckduckgo")
+        super(DuckDuckGoIO, self).__init__("duckduckgo")
 
     #Busca en duckduck con los parametros que se pasen
-    def search(query):
+    def search(self,query):
         links=[]        
-        IMPORTIO_USER = "7d0326db-696a-436d-8aba-f6c2e1c9e921"
+        IMPORT_IO_USER = "7d0326db-696a-436d-8aba-f6c2e1c9e921"
         IMPORTIO_API_KEY = "89Gl8Ce2tiqX949GcKQTE9hCg6NW%2FkN36WpGKEA4knjhoTTRT72%2BitSWPicKFsZ4RmTwvyMbC%2BOrPtxAvy1EGw%3D%3D"
         url="https://api.import.io/store/data/97e350d1-d55c-4c66-bcc4-5c2bd2eb8765/_query?input/query="+query+"&_user="+IMPORT_IO_USER+"&_apikey="+IMPORTIO_API_KEY
         response=urllib2.urlopen(url)
@@ -64,9 +65,9 @@ class DuckDuckGoIO(SearchEngine):
 class Slideshare(SearchEngine):
 
     def __init__(self):
-        super(DuckDuckGo, self).__init__("slideshare")
+        super(Slideshare, self).__init__("slideshare")
 
-    def search(query):
+    def search(self,query):
 
         ####Slideshare API keys####
         ssapi_key = 'lKp4aIF5' # Your api key

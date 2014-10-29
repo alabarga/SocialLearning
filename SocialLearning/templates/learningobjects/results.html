@@ -6,8 +6,12 @@
 
     <h1>{{message}}</h1>
     {% for res in results %}
-    
+    	
+    	<div class="node" id="mnodeId">
+    		<a class="embedly-card" href="{{ res }}">Prueba</a>
+    	</div>
 
     {% endfor %}
+    <script src="//cdn.embedly.com/widgets/platform.js"></script>
 </body>
 </html>
