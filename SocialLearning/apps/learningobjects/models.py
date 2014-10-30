@@ -1,4 +1,5 @@
 from django.db import models
+from taggit.managers import TaggableManager
 from redactor.fields import RedactorField
 
 # Create your models here.
@@ -17,6 +18,12 @@ class SocialProfile(models.Model):
     url = models.URLField()
     descripcion = RedactorField(null=True, blank=True)
 
+    def get_interest(self):
+        return 0.5
+
+    def get_relevance(self, topic):
+        return 0.5
+        
     def __unicode__(self):
         return self.username + '@' + str(self.social_network)
 
@@ -48,17 +55,27 @@ class Resource(models.Model):
     title = models.CharField(max_length=255)
     url = models.URLField()
     container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
-    category = models.CharField(max_length=255)
     description = RedactorField(null=True, blank=True)    
     seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
     last_processed = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
+    tags = TaggableManager()
 
     def __unicode__(self):
         return self.title
 
+    def get_interest(self):
+        return 0.5
+
+    def get_relevance(self, topic):
+        return 0.5
+
     def find_mentions(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.identifier = "" # sha1
+        super(Resource, self).save(*args, **kwargs)
 
 class Collection(models.Model):
     name = models.CharField(max_length=255)
@@ -71,6 +88,7 @@ class Mention(models.Model):
     profile = models.ForeignKey(SocialProfile,related_name="mentions",)
     resource = models.ForeignKey(Resource,related_name="mention",)
     card = RedactorField(null=True, blank=True)
+    tags = TaggableManager()
 
     def __unicode__(self):
         return "%s by %s" % (self.resource, self.profile)

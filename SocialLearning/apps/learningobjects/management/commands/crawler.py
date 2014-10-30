@@ -28,13 +28,16 @@ class Command(BaseCommand):
         make_option('-q','--query',
             dest='query',
             help='Palabra clave a buscar'),
+        make_option('-u','--url',
+            dest='URL',
+            help='URL del recurso'),
         )
 
     def handle(self, *args, **options):
     	results=[]
     	if options['query'] == None:
 
-    		#r = Resource.objects.filter()
+    		#r = Resource.objects.filter(status=Resource.ADDED)
     		#for res in r:
 			#	results+=r.url				
             raise CommandError("Option `--query=...` must be specified.")

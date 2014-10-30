@@ -4,3 +4,7 @@ from api import views
 
 router = routers.DefaultRouter()
 router.register(r'resources', views.ResourceViewSet)
+
+urlpatterns = patterns('',
+    url(r'^', include(router.urls)),
+)
