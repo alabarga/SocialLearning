@@ -29,13 +29,21 @@ class Command(BaseCommand):
         make_option('-q','--query',
             dest='query',
             help='Palabra clave a buscar'),
+        make_option('-u','--url',
+            dest='URL',
+            help='URL del recurso'),
         )
 
     def handle(self, *args, **options):
+    	results=[]
     	if options['query'] == None:
+
+    		#r = Resource.objects.filter(status=Resource.ADDED)
+    		#for res in r:
+			#	results+=r.url				
             raise CommandError("Option `--query=...` must be specified.")
         else:
-			results=[]
+			
 			query=options['query']
 			print "You searched for "+query
             #no funciong=Google()
@@ -49,12 +57,13 @@ class Command(BaseCommand):
 				results+=links
 			shuffle(results)
 			results=results[:15]
-			#results=['http://mashable.com/category/3d-printing/']
-			for l in results:
-				r=createResource(l)
-				if r!=None:
-					m=createMention(l,r)
 
+		for l in results:
+			r=createResource(l)
+			m=createMention(l,r)
+        #a=Resource.objects.all()
+        #print "Recursos en la base de datos"
+        #print a
 
 def createResource(url):
 	if resolve(url)!=None:

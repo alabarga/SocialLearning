@@ -1,0 +1,27 @@
+flujo de trabajo
+
+RESOURCES_STATUS = (
+    (0, 'Added'),
+    (1, 'Described'),
+    (2, 'Discovered'),
+    (3, 'Expanded'),
+)
+
+commands:
+
+- add (link or query)
+- describe (link or Resources.objects.filter(status=0))
+- discover (link or Resources.objects.filter(status=1))
+- expand (link or Resources.objects.filter(status=2))
+
+SHA1 en Resource.identifier
+
+discover
+ res.tags.add("red", "green", "fruit")
+
+SocialProfile
+ - meter los Crwalers en utils
+ # num_followers
+ # num_posts
+ #  ...
+ # num_posts para un tag 
