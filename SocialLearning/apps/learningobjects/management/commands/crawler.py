@@ -9,6 +9,7 @@ import tweepy
 from tweepy import Stream
 from tweepy import OAuthHandler
 from random import shuffle
+import re
 
 #####TWITTER KEYS#####
 CONSUMER_KEY = 'ieZUZgZrSJJE0QLBBOsgXg'
@@ -48,13 +49,12 @@ class Command(BaseCommand):
 				results+=links
 			shuffle(results)
 			results=results[:15]
+			#results=['http://mashable.com/category/3d-printing/']
 			for l in results:
 				r=createResource(l)
 				if r!=None:
 					m=createMention(l,r)
-        a=Resource.objects.all()
-        print "Recursos en la base de datos"
-        print a
+
 
 def createResource(url):
 	if resolve(url)!=None:
@@ -101,9 +101,10 @@ def createMention(url,res):
 		if len(s)==0:
 			user_url="https://delicious.com/"+author
 			s=SocialProfile.objects.create(username=author,social_network="Delicious",url=user_url)
-			print "Creado el usuario "+s
+			print "Creado el usuario "+str(s)
 			Mention.objects.create(profile=s,resource=res)
 			print "Creada mention para delicious"
+		##Get tags
 	for r in twitRes:
 		author=r.user.screen_name
 		s=SocialProfile.objects.filter(username=author)
@@ -114,4 +115,66 @@ def createMention(url,res):
 			print "Creado el usuario "+str(s)
 			Mention.objects.create(profile=s,resource=res)
 			print "Creada mention para twitter"
-	  
+	  	##Get tags
+		hts=extract_hash_tags(r.text)
+		for ht in hts:
+			rt=relatedTo(author,furl,ht,"twitter",r.id)
+			print "____________"
+			print "La url "+furl+" esta relacionada con:"
+			print ""
+			print rt 
+			print "------------"
+
+
+def extract_hash_tags(s):
+    return set(part[1:] for part in s.split() if part.startswith('#'))      
+
+def extract_urls(s):
+    a= re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', s)
+    return a
+
+def relatedTo(user,url,tag,social_network,max_id=0):
+    firsturl=url
+    tagl=[]
+    tagl.append(tag)
+    relatedToTweet=[]
+    relatedToDel=[]
+    results=[]
+    if social_network=="twitter":
+        print "Entrado en reltated totwitter para: "+url
+        response=twittApi.user_timeline(user=user,count=50)
+        for tweet in response:
+            ht=extract_hash_tags(tweet.text)
+            intersect=list(set(tagl) & set(ht))
+            if len(intersect)>0:
+                #relatedToTweet.append(tweet)
+                ##mirar si en el texto hay enlaces
+                ##para cada enlace dle texto
+                links= extract_urls(str(tweet.text))
+                for link in links:
+                    if resolve(link)!=None:
+						link=resolve(link)
+                    q=Resource.objects.filter(url=link)
+                    if  len(q)==0:
+                        results.append(link)
+    
+    elif social_network=="delicious":    
+        url="http://feeds.delicious.com/v2/json/"+str(user)+"/"+urllib2.quote(str(tag),'')
+        print "accediendo a"+ url#para cambiar los espacios a %20 
+        response=urllib2.urlopen(url)
+        print "opene2"
+        resp=json.loads(response.read())
+        print "opene2"
+        for res in resp:
+            if firsturl!=str(res["u"]):
+                print "Link relacionado en delicious: "+str(res["u"])
+                
+                try:
+                    print "Succesfully inserted resource delicious"
+                except:
+                    print "Something went wrong you silly boy in  delicious"
+                    pass
+            else:
+                print "eran el mimso url"
+
+    return results
