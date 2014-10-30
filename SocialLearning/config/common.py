@@ -38,10 +38,10 @@ class Common(Configuration):
         # 'django.contrib.humanize',
 
         # Admin
+        'suit',        
         'django.contrib.admin',
     )
     THIRD_PARTY_APPS = (
-        'suit',
         'crispy_forms',  # Form layouts
         'avatar',  # for user avatars
         'allauth',  # registration

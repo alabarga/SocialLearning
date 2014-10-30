@@ -20,14 +20,39 @@ class SocialProfile(models.Model):
     def __unicode__(self):
         return self.username + '@' + str(self.social_network)
 
+class ResourceContainer(models.Model):    
+    url = models.URLField()
+    rss = models.URLField()
+    name = models.CharField(max_length=255, null=True, blank=True)
+    descripcion = RedactorField(null=True, blank=True)
+    last_processed = models.DateTimeField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.url 
+
 class Resource(models.Model):
-    primary_key = models.CharField(max_length=20,null=True, blank=True)#si realmente se quiere como pk (primary_key=True), pero null=True y blank=True?
+
+    ADDED = 0;
+    DESCRIBED = 1;
+    DISCOVERED = 2;
+    EXPANDED = 3;
+
+    RESOURCES_STATUS = (
+        (ADDED, 'Added'),
+        (DESCRIBED, 'Described'),
+        (DISCOVERED, 'Discovered'),
+        (EXPANDED, 'Expanded'),
+    )
+
+    identifier = models.CharField(max_length=20, null=True, blank=True)
     title = models.CharField(max_length=255)
     url = models.URLField()
+    container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
     category = models.CharField(max_length=255)
     description = RedactorField(null=True, blank=True)    
-    seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name="resources")
-    #last_processed = models.DateTimeField(null=True, blank=True, through='Mention') ///No se que querias hacer aqui, pero el through no se utiliza solo cuando son many to many?
+    seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
+    last_processed = models.DateTimeField(null=True, blank=True)
+    status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
 
     def __unicode__(self):
         return self.title

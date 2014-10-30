@@ -31,10 +31,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+    	results=[]
     	if options['query'] == None:
+
+    		#r = Resource.objects.filter()
+    		#for res in r:
+			#	results+=r.url				
             raise CommandError("Option `--query=...` must be specified.")
         else:
-			results=[]
+			
 			query=options['query']
 			print "You searched for "+query
             #no funciong=Google()
@@ -48,12 +53,12 @@ class Command(BaseCommand):
 				results+=links
 			shuffle(results)
 			results=results[:15]
-			for l in results:
-				r=createResource(l)
-				m=createMention(l,r)
-        a=Resource.objects.all()
-        print "Recursos en la base de datos"
-        print a
+		for l in results:
+			r=createResource(l)
+			m=createMention(l,r)
+        #a=Resource.objects.all()
+        #print "Recursos en la base de datos"
+        #print a
 
 def createResource(url):
 	if resolve(url)!=None:
