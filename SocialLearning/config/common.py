@@ -38,22 +38,26 @@ class Common(Configuration):
         # 'django.contrib.humanize',
 
         # Admin
+        'suit',        
         'django.contrib.admin',
     )
     THIRD_PARTY_APPS = (
-        'suit',
         'crispy_forms',  # Form layouts
         'avatar',  # for user avatars
         'allauth',  # registration
         'allauth.account',  # registration
         'allauth.socialaccount',  # registration
+        'rest_framework',
+        'rest_framework_swagger',
+        'taggit',
     )
 
     # Apps specific for this project go here.
     LOCAL_APPS = (
         'users',  # custom users app
         # Your stuff: custom apps go here
-        'learningobjects'
+        'learningobjects',
+        'api',
     )
 
     # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -272,3 +276,32 @@ class Common(Configuration):
     # END LOGGING CONFIGURATION
 
     # Your common stuff: Below this line define 3rd party library settings
+
+    REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+        'DEFAULT_PERMISSION_CLASSES': [
+            'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        ]
+    }
+
+    SWAGGER_SETTINGS = {
+        "exclude_namespaces": [], # List URL namespaces to ignore
+        "api_version": '0.1',  # Specify your API's version
+        "api_path": "/api",  # Specify the path to your API not a root level
+        "enabled_methods": [  # Specify which methods to enable in Swagger UI
+            'get',
+            'post',
+            'put',
+            'patch',
+            'delete'
+        ],
+        "api_key": '', # An API key
+        "is_authenticated": False,  # Set to True to enforce user authentication,
+        "is_superuser": False,  # Set to True to enforce admin only access
+        "permission_denied_handler": None, # If user has no permisssion, raise 403 error
+    }
+
+    SUIT_CONFIG = {
+        'ADMIN_NAME': 'Administración'
+    }

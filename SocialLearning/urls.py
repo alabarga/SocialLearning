@@ -35,4 +35,10 @@ urlpatterns = patterns('',
 
     url(r'^k/', include('learningobjects.urls')),
 
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+    url(r'^api/', include('api.urls', namespace='api')),
+
+    url(r'^api-docs/', include('rest_framework_swagger.urls')), 
+     
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
