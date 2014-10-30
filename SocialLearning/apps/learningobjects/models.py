@@ -15,7 +15,7 @@ class SocialNetwork(models.Model):
 class SocialProfile(models.Model):
     username = models.CharField(max_length=255)
     social_network = models.ForeignKey(SocialNetwork,related_name="profiles",)
-    url = models.URLField()
+    url = models.URLField(max_length=255)
     descripcion = RedactorField(null=True, blank=True)
 
     def get_interest(self):

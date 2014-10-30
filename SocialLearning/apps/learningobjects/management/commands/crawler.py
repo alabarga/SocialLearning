@@ -56,6 +56,7 @@ class Command(BaseCommand):
 				results+=links
 			shuffle(results)
 			results=results[:15]
+
 		for l in results:
 			r=createResource(l)
 			m=createMention(l,r)
@@ -68,18 +69,27 @@ def createResource(url):
 		url=resolve(url)
 	g = Goose()
 	a= g.extract(url=url)
-	r=Resource.objects.filter(url=url)
-	if len(r)>0:		
-		print "El recurso ya lo tenia"
-		r=r[0]
+	if len(url)>200:
+		print "Los links largos de duckduckgo no funcionan"
+		return None
 	else:
-		if a.title==None or a.title=="":
-			title="notitle"
+		r=Resource.objects.filter(url=url)
+		if len(r)>0:		
+			print "El recurso ya lo tenia"
+			r=r[0]
 		else:
-			title=a.title
-		r=Resource.objects.create(title=title,url=url,category="post")
-		print "Creado el recurso para "+url
-	return r
+			if a.title==None or a.title=="":
+				title="notitle"
+			else:
+				title=a.title
+			try:
+				r=Resource.objects.create(title=title,url=url,category="post")
+			except:
+				print "no ha ido bien"
+				print title
+				print url
+			print "Creado el recurso para "+url
+		return r
 
 def createMention(url,res):
 	if resolve(url)!=None:
@@ -103,7 +113,7 @@ def createMention(url,res):
 			Mention.objects.create(profile=s,resource=res)
 			print "Creada mention para delicious"
 	for r in twitRes:
-		author=r.author.name
+		author=r.user.screen_name
 		s=SocialProfile.objects.filter(username=author)
 		if len(s)==0:
 			user_url="https://twitter.com/"+author
