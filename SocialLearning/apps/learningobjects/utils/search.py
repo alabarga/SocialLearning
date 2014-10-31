@@ -5,6 +5,7 @@ import unfurl
 import urllib2
 import json
 import time
+from urlunshort import resolve
 
 class SearchEngine(object):
 
@@ -13,13 +14,11 @@ class SearchEngine(object):
 
 
     def clean(self,url):
-        
-        try:
-           url=unfurl.expand_url(url)           
-        except (RuntimeError, TypeError, NameError):
-           pass
-
-        return url
+        furl=url
+        while resolve(url)!=None:
+            furl=url
+            url=resolve(url)
+        return furl
 
 class Google(SearchEngine):
     def __init__(self):
