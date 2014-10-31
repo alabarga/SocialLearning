@@ -4,6 +4,8 @@ from django.core.management.base import BaseCommand, CommandError
 from learningobjects.models import *
 from optparse import make_option
 import readability
+import xlsxwriter
+from goose import Goose
 
 ###Readability parser
 red_par=readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
@@ -11,6 +13,7 @@ red_par=readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
 class Command(BaseCommand):
     args = 'query'
     help = 'Expandir el numero de documentos'
+    
 
     option_list = BaseCommand.option_list + (
         make_option('-u','--url',
@@ -20,6 +23,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         results=[]
+        row=0
+        workbook = xlsxwriter.Workbook('data.xlsx')
+        worksheet = workbook.add_worksheet()
         if options['URL'] == None:   
             inp=raw_input("This will describe EVERY Resource with ´Added´ status on the database. Are you sure(y/n)?:")
             inp=inp.lower()
@@ -27,7 +33,8 @@ class Command(BaseCommand):
                 resources=Resource.objects.filter(status=Resource.ADDED)
                 for res in resources:
                     url=res.url
-                    #response=red_par.get_article_content(url).content
+                    get_def(url,worksheet,row)
+                    row+=1
                     res.status=Resource.DESCRIBED
                     res.save()
                     print "Updated.."
@@ -35,7 +42,39 @@ class Command(BaseCommand):
             url=options['URL']
             resource=Resource.objects.filter(url=url,status=Resource.ADDED)
             if len(resource)>0:
-                response=red_par.get_article_content(url).content
+                get_def(url,worksheet,row)
+                row+=1
                 resource.update(status=Resource.DESCRIBED)
             else:
                 print "That link is not in the database or is not with ´Added´ status. Add it first (python manage.py add -u "+url+")"
+        workbook.close()
+
+def get_def(url,worksheet,r):
+    row = r*14
+    col = 0
+    response=red_par.get_article_content(url).content
+    g = Goose()
+    a= g.extract(url=url)
+    data=[
+        ['domain',response['domain'] or a.domain],
+        ['author',response['author']],
+        ['url_hash',a.link_hash],
+        #['tags',a.tags],
+        ['url',response['url']],
+        ['meta_keywords',a.meta_keywords],
+        ['meta_lang',a.meta_lang],
+        ['meta_description',a.meta_description],
+        ['short_url',response['short_url']],
+        ['title',response['title'] or a.title],
+        ['excerpt',response['excerpt']],
+        ['date_published',response['date_published'] or a.publish_date],
+    ]
+    
+    worksheet.write(row, col,"Described for url: "+url)
+    row+=1
+    # Iterate over the data and write it out row by row.
+    for item, d in (data):
+        worksheet.write(row, col,item)
+        worksheet.write(row, col + 1, d)
+        row += 1
+    worksheet.write(row, col,"  ")
