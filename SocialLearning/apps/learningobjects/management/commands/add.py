@@ -5,10 +5,7 @@ from optparse import make_option
 from goose import Goose
 from urlunshort import resolve
 import hashlib
-import tweepy
-from tweepy import Stream
-from tweepy import OAuthHandler
-from random import shuffle
+
 
 class Command(BaseCommand):
     args = 'query'
