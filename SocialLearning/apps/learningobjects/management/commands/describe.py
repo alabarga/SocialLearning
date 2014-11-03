@@ -6,6 +6,10 @@ from optparse import make_option
 import readability
 import xlsxwriter
 from goose import Goose
+from learningobjects.utils import feedfinder
+import add
+from django.core.management import call_command
+import feedparser
 
 ###Readability parser
 red_par=readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
@@ -50,7 +54,7 @@ class Command(BaseCommand):
         workbook.close()
 
 def get_def(url,worksheet,r):
-    row = r*14
+    row = r*18
     col = 0
     response=red_par.get_article_content(url).content
     g = Goose()
@@ -69,7 +73,12 @@ def get_def(url,worksheet,r):
         ['excerpt',response['excerpt']],
         ['date_published',response['date_published'] or a.publish_date],
     ]
-    
+    feeds=feedfinder.feeds(url+"feed")
+    print feeds
+    i=0
+    for f in feeds:
+        data.append(["feed"+str(i),f])
+    print data
     worksheet.write(row, col,"Described for url: "+url)
     row+=1
     # Iterate over the data and write it out row by row.
@@ -78,3 +87,18 @@ def get_def(url,worksheet,r):
         worksheet.write(row, col + 1, d)
         row += 1
     worksheet.write(row, col,"  ")
+    add_feed(feeds)
+
+def add_feed(feeds):
+    for feed in feeds:
+        res=Resource.objects.filter(url=feed)
+        if len(res)==0:
+            r=feedparser.parse(feed)
+            i=0
+            for entry in r.entries:
+                link=entry.links[0].href
+                call_command('add', 'foo', URL=str(link))
+                if i<5:
+                    i+=1
+                else:
+                    break
