@@ -58,7 +58,11 @@ def get_def(url,worksheet,r):
     col = 0
     response=red_par.get_article_content(url).content
     g = Goose()
-    a= g.extract(url=url)
+    try:
+        a= g.extract(url=url)   
+    except:
+        a=None
+    response=getAtrib(response)
     data=[
         ['domain',response['domain'] or a.domain],
         ['author',response['author']],
@@ -102,3 +106,10 @@ def add_feed(feeds):
                     i+=1
                 else:
                     break
+
+def getAtrib(res):
+    keys=['domain','author','url','short_url','title','excerpt','date_published']
+    for key in keys:
+        if key not in res.viewkeys():
+            res[key]=""
+    return res

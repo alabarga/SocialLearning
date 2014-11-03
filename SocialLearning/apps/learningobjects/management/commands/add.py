@@ -5,6 +5,7 @@ from optparse import make_option
 from goose import Goose
 from urlunshort import resolve
 import hashlib
+import sys
 
 
 class Command(BaseCommand):
@@ -54,14 +55,21 @@ def createResource(url):
             r=r[0]
         else:
             g = Goose()
-            a= g.extract(url=url)   
-            if a.title==None or a.title=="":
+            print url
+            try:
+                a= g.extract(url=url)   
+            except:
+                a=None
+            if a==None or a.title==None or a.title=="":
                 title="notitle"
             else:
                 title=a.title
             try:
+                tags=["one","two"]
                 r=Resource.objects.create(title=title,url=url,status=Resource.ADDED)
-            except:
+                r.tags.add("one two")
+            except TypeError as e:
+                print e
                 print "no ha ido bien"
                 print title
                 print url
