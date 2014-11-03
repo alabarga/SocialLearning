@@ -59,7 +59,7 @@ class Resource(models.Model):
     seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
     last_processed = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
-    tags = TaggableManager(blank=True)
+    tags = TaggableManager()
 
     def __unicode__(self):
         return self.title
