@@ -21,7 +21,14 @@ discover
 
 SocialProfile
  - meter los Crwalers en utils
- # num_followers
- # num_posts
+ # num_followers (tweepy)twittApi.get_user(user).followers_count
+ # num_posts (tweepy)twittApi.get_user(user).statuses_count
  #  ...
  # num_posts para un tag 
+    a=twittApi.search(q=hashtag,show_user=True)
+    users={}
+    for r in a:
+        if r.user.screen_name not in users:
+            users[r.user.screen_name]=1
+        else:
+            users[r.user.screen_name]+=1
