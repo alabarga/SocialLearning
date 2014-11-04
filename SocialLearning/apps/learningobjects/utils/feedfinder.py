@@ -46,7 +46,7 @@ Also Jason Diamond, Brian Lalor for bug reporting and patches"""
 
 _debug = 0
 
-import sgmllib, urllib, urlparse, re, sys, robotparser
+import sgmllib, urllib, urllib2, urlparse, re, sys, robotparser
 
 import threading
 class TimeoutError(Exception): pass
@@ -103,7 +103,8 @@ class URLGatekeeper:
         self.urlopener = urllib.FancyURLopener()
         self.urlopener.version = "feedfinder/" + __version__ + " " + self.urlopener.version + " +http://www.aaronsw.com/2002/feedfinder/"
         _debuglog(self.urlopener.version)
-        self.urlopener.addheaders = [('User-agent', self.urlopener.version)]
+        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+        self.urlopener.addheaders = [('User-agent', user_agent)]
         robotparser.URLopener.version = self.urlopener.version
         robotparser.URLopener.addheaders = self.urlopener.addheaders
         
@@ -228,7 +229,7 @@ def isFeed(uri):
     _debuglog('seeing if %s is a feed' % uri)
     protocol = urlparse.urlparse(uri)
     if protocol[0] not in ('http', 'https'): return 0
-    data = _gatekeeper.get(uri)
+    data = _gatekeeper.get(uri, check=False)
     return couldBeFeedData(data)
 
 def sortFeeds(feed1Info, feed2Info):
@@ -251,7 +252,7 @@ def feeds(uri, all=False, querySyndic8=False, _recurs=None):
     if _recurs is None: _recurs = [uri]
     fulluri = makeFullURI(uri)
     try:
-        data = _gatekeeper.get(fulluri, check=False)
+        data = _gatekeeper.get(fulluri, check=False)	
     except:
         return []
     # is this already a feed?
@@ -324,7 +325,7 @@ def test():
     failed = []
     count = 0
     while 1:
-        data = _gatekeeper.get(uri)
+        data = _gatekeeper.get(uri, check=False)
         if data.find('Atom autodiscovery test') == -1: break
         sys.stdout.write('.')
         sys.stdout.flush()

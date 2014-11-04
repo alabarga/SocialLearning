@@ -15,9 +15,12 @@ class SearchEngine(object):
 
     def clean(self,url):
         furl=url
-        while resolve(url)!=None:
+        i=0
+        while resolve(url)!=None and i<5:
             furl=url
             url=resolve(url)
+            i+=1
+            print i
         return furl
 
 class Google(SearchEngine):

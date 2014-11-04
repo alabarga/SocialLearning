@@ -10,6 +10,7 @@ from learningobjects.utils import feedfinder
 import add
 from django.core.management import call_command
 import feedparser
+from pyteaser import SummarizeUrl
 
 ###Readability parser
 red_par=readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
@@ -56,33 +57,33 @@ class Command(BaseCommand):
 def get_def(url,worksheet,r):
     row = r*18
     col = 0
-    response=red_par.get_article_content(url).content
+    try:
+        response=red_par.get_article_content(url.encode('utf-8')).content
+    except:
+        response=None
     g = Goose()
     try:
-        a= g.extract(url=url)   
+        a= g.extract(url=url.encode('utf-8'))  
     except:
         a=None
+    summaries=SummarizeUrl(url.encode('utf-8'))
+    print summaries
     response=getAtrib(response)
-    data=[
-        ['domain',response['domain'] or a.domain],
-        ['author',response['author']],
-        ['url_hash',a.link_hash],
-        #['tags',a.tags],
-        ['url',response['url']],
-        ['meta_keywords',a.meta_keywords],
-        ['meta_lang',a.meta_lang],
-        ['meta_description',a.meta_description],
-        ['short_url',response['short_url']],
-        ['title',response['title'] or a.title],
-        ['excerpt',response['excerpt']],
-        ['date_published',response['date_published'] or a.publish_date],
-    ]
+    data=[]
+    #['tags',a.tags],
+    keys=['domain','author','url_hash','url','meta_keywords','meta_lang','meta_description','short_url','title','excerpt','date_published','publish_date']
+    for key in keys:
+        if response!=None and key in response and response[key]!=None and len(response[key])>0:
+            rowData=[key,response[key]]
+        elif a!=None and key in dir(a) and getattr(a,key)!=None and len(getattr(a,key))>0:
+            rowData=[key,getattr(a,key)]
+        else:
+            rowData=[key,""]
+        data.append(rowData)
     feeds=feedfinder.feeds(url+"feed")
-    print feeds
     i=0
     for f in feeds:
         data.append(["feed"+str(i),f])
-    print data
     worksheet.write(row, col,"Described for url: "+url)
     row+=1
     # Iterate over the data and write it out row by row.

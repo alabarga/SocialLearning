@@ -42,6 +42,10 @@ class Command(BaseCommand):
                 for res in resources:
                     url=res.url
                     res.status=Resource.DISCOVERED
+                    tags=getTags(url)
+                    for tag in tags:
+                        res.tags.add(tag)
+                    print res.tags.all()
                     res.save()
                     print "Updated.."
         else:
@@ -54,7 +58,7 @@ class Command(BaseCommand):
             for tag in tags:
                 resource.tags.add(tag)
             print resource.tags.all()
-            #resource.status=Resource.DISCOVERED
+            resource.status=Resource.DISCOVERED
             resource.save()
             
             
