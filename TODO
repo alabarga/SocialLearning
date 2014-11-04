@@ -11,8 +11,8 @@ commands:
 
 - add (link or query)
 - describe (link or Resources.objects.filter(status=0))
-- discover (link or Resources.objects.filter(status=1))
-- expand (link or Resources.objects.filter(status=2))
+- discover (link or Resources.objects.filter(status=1))menciones
+- expand (link or Resources.objects.filter(status=2)) buscar enlaces para las misma etiquetas en el mismo usuario
 
 SHA1 en Resource.identifier
 
