@@ -39,14 +39,14 @@ class Command(BaseCommand):
             inp=inp.lower()
             if inp=="y" or inp=="yes":
                 resources=Resource.objects.filter(status=Resource.DESCRIBED)
-                for res in resources:
-                    url=res.url
-                    res.status=Resource.DISCOVERED
-                    author, tags=getMentions(url)
+                for resource in resources:
+                    url=resource.url
+                    resource.status=Resource.DISCOVERED
+                    author, tags=getMentions(url,resource)
                     for tag in tags:
-                        res.tags.add(tag)
-                    #print res.tags.all()
-                    res.save()
+                        resource.tags.add(tag)
+                    #print resource.tags.all()
+                    resource.save()
                     #print "Updated.."
         else:
             url=options['URL']
@@ -54,7 +54,7 @@ class Command(BaseCommand):
                 resource=Resource.objects.get(url=url,status=Resource.DESCRIBED)
             except:
                 print "That link is not in the database or is not with ´Described´ status. Add it first (python manage.py add -u "+url+")"            
-            author,tags=getMentions(url)
+            author,tags=getMentions(url,resource)
             for tag in tags:
                 resource.tags.add(tag)
             #print resource.tags.all()
@@ -63,7 +63,7 @@ class Command(BaseCommand):
 
             
             
-def getMentions(url):
+def getMentions(url,resource):
     furl=url
     engine=SearchEngine("none")
     url=engine.clean(url)
@@ -75,8 +75,8 @@ def getMentions(url):
     twitRes=s.search(furl)
     tags=[]
     authors=[]
-    print "--------------Menciones-------------------------"
-    print "La url "+furl+" tiene las siguiente menciones:"
+    #print "--------------Menciones-------------------------"
+    #print "La url "+furl+" tiene las siguiente menciones:"
     for a in delRes:
         author=a["a"]
         if author not in authors:
@@ -86,6 +86,7 @@ def getMentions(url):
                 tags.insert(0,t)
     for r in twitRes:
         author=r.user.screen_name
+        user_url="https://twitter.com/"+author
         if author not in authors:
             authors.insert(0,author)
         hts=extract_hash_tags(r.text)
@@ -94,9 +95,37 @@ def getMentions(url):
             if ht not in tags:
                 tags.insert(0,ht)
             inner_t.append(ht)
-        print "En Twitter, Usuario: "+author+", Tags: "+", ".join(inner_t)+", Fecha: "+str(r.created_at)
-    print "___________________________________________________"
+        #print "En Twitter, Usuario: "+author+", Tags: "+", ".join(inner_t)+", Fecha: "+str(r.created_at)
+        sn=createInstance("SocialNetwork",name="Twitter",url="http://twitter.com")
+        sp=createInstance("SocialProfile",username=author,sn=sn,user_url="http://twitter.com/"+str(author))
+        m=createInstance("Mention",sp=sp,resource=resource)
     return authors, tags
 
 def extract_hash_tags(s):
     return set(part[1:] for part in s.split() if part.startswith('#'))
+
+def createInstance(model,**kwargs):
+    if model=="SocialNetwork":
+        sn=SocialNetwork.objects.filter(name=kwargs["name"])
+        if len(sn)==0:
+            sn=SocialNetwork.objects.create(name=kwargs["name"],url=kwargs["url"])
+        else:
+            sn=sn[0]
+        return sn
+    if model=="SocialProfile":
+        sp=SocialProfile.objects.filter(username=kwargs["username"],social_network=kwargs["sn"])
+        if len(sp)==0:
+            sp=SocialProfile.objects.create(username=kwargs["username"],social_network=kwargs["sn"],url=kwargs["user_url"])
+        else:
+            sp=sp[0]
+        return sp
+    if model=="Mention":
+        m=Mention.objects.filter(profile=kwargs["sp"],resource=kwargs["resource"])
+        if len(m)==0:
+            m=Mention.objects.create(profile=kwargs["sp"],resource=kwargs["resource"])
+            m.tags.add("")
+            print "mencion creada"
+        else:
+            m=m[0]
+            print "Esa mencion ya estaba"
+        return m
