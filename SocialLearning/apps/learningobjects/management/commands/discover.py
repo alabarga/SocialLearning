@@ -42,27 +42,28 @@ class Command(BaseCommand):
                 for res in resources:
                     url=res.url
                     res.status=Resource.DISCOVERED
-                    tags=getTags(url)
+                    author, tags=getMentions(url)
                     for tag in tags:
                         res.tags.add(tag)
-                    print res.tags.all()
+                    #print res.tags.all()
                     res.save()
-                    print "Updated.."
+                    #print "Updated.."
         else:
             url=options['URL']
             try:
                 resource=Resource.objects.get(url=url,status=Resource.DESCRIBED)
             except:
                 print "That link is not in the database or is not with ´Described´ status. Add it first (python manage.py add -u "+url+")"            
-            tags=getTags(url)
+            author,tags=getMentions(url)
             for tag in tags:
                 resource.tags.add(tag)
-            print resource.tags.all()
+            #print resource.tags.all()
             resource.status=Resource.DISCOVERED
             resource.save()
+
             
             
-def getTags(url):
+def getMentions(url):
     furl=url
     engine=SearchEngine("none")
     url=engine.clean(url)
@@ -73,16 +74,29 @@ def getTags(url):
     s=twittApi
     twitRes=s.search(furl)
     tags=[]
+    authors=[]
+    print "--------------Menciones-------------------------"
+    print "La url "+furl+" tiene las siguiente menciones:"
     for a in delRes:
+        author=a["a"]
+        if author not in authors:
+            authors.insert(0,author)
         for t in a["t"]:
             if t not in tags:
                 tags.insert(0,t)
     for r in twitRes:
+        author=r.user.screen_name
+        if author not in authors:
+            authors.insert(0,author)
         hts=extract_hash_tags(r.text)
+        inner_t=[]
         for ht in hts:
             if ht not in tags:
                 tags.insert(0,ht)
-    return tags
+            inner_t.append(ht)
+        print "En Twitter, Usuario: "+author+", Tags: "+", ".join(inner_t)+", Fecha: "+str(r.created_at)
+    print "___________________________________________________"
+    return authors, tags
 
 def extract_hash_tags(s):
     return set(part[1:] for part in s.split() if part.startswith('#'))
