@@ -111,3 +111,20 @@ def extract_hash_tags(s):
 def extract_urls(s):
     a= re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', s)
     return a
+
+def add_feeds(feeds):
+    for feed in feeds:
+        add_feed(feed)
+
+def add_feed(feed):
+    res=Resource.objects.filter(url=feed)
+    if len(res)==0:
+        r=feedparser.parse(feed)
+        i=0
+        for entry in r.entries:
+            link=entry.links[0].href
+            call_command('add', 'foo', URL=str(link))
+            if i<5:
+                i+=1
+            else:
+                break       

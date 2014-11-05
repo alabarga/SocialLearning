@@ -7,7 +7,7 @@ import readability
 import xlsxwriter
 from goose import Goose
 from learningobjects.utils import feedfinder
-import add
+from learningobjects.management.commands import add
 from django.core.management import call_command
 import feedparser
 from pyteaser import SummarizeUrl
@@ -24,7 +24,13 @@ class Command(BaseCommand):
         make_option('-u','--url',
             dest='URL',
             help='URL del recurso'),
-        )
+        make_option('-v','--verbose',
+            dest='verbose',
+            help='verbose'),
+        make_option('-x','--excel',
+            dest='excel',
+            help='Create Excel output'),        
+        ) 
 
     def handle(self, *args, **options):
         results=[]
@@ -57,17 +63,64 @@ class Command(BaseCommand):
 def get_def(url,worksheet,r):
     row = r*18
     col = 0
+
+    # Readability
     try:
         response=red_par.get_article_content(url.encode('utf-8')).content
     except:
         response=None
+"""
+[u'content',
+ u'domain',
+ u'author',
+ u'url',
+ u'short_url',
+ u'title',
+ u'excerpt',
+ u'direction',
+ u'word_count',
+ u'total_pages',
+ u'next_page_id',
+ u'dek',
+ u'lead_image_url',
+ u'rendered_pages',
+ u'date_published']
+"""
+
+    #Goose
     g = Goose()
     try:
         a= g.extract(url=url.encode('utf-8'))  
     except:
         a=None
+
+"""
+goose.article.Article()
+
+ 'additional_data',
+ 'canonical_link',
+ 'cleaned_text',
+ 'doc',
+ 'domain',
+ 'final_url',
+ 'link_hash',
+ 'meta_description',
+ 'meta_favicon',
+ 'meta_keywords',
+ 'meta_lang',
+ 'movies',
+ 'publish_date',
+ 'raw_doc',
+ 'raw_html',
+ 'tags',
+ 'title',
+ 'top_image',
+ 'top_node']
+
+"""
     summaries=SummarizeUrl(url.encode('utf-8'))
     print summaries
+
     response=getAtrib(response)
     data=[]
     #['tags',a.tags],
@@ -80,10 +133,18 @@ def get_def(url,worksheet,r):
         else:
             rowData=[key,""]
         data.append(rowData)
+
+"""
     feeds=feedfinder.feeds(url+"feed")
     i=0
     for f in feeds:
         data.append(["feed"+str(i),f])
+"""
+
+    feed=feedfinder.feed(url)
+    if feed:
+        data.append(["feed",feed])
+
     worksheet.write(row, col,"Described for url: "+url)
     row+=1
     # Iterate over the data and write it out row by row.
@@ -93,20 +154,6 @@ def get_def(url,worksheet,r):
         row += 1
     worksheet.write(row, col,"  ")
     add_feed(feeds)
-
-def add_feed(feeds):
-    for feed in feeds:
-        res=Resource.objects.filter(url=feed)
-        if len(res)==0:
-            r=feedparser.parse(feed)
-            i=0
-            for entry in r.entries:
-                link=entry.links[0].href
-                call_command('add', 'foo', URL=str(link))
-                if i<5:
-                    i+=1
-                else:
-                    break
 
 def getAtrib(res):
     keys=['domain','author','url','short_url','title','excerpt','date_published']
