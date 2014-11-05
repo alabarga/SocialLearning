@@ -31,7 +31,9 @@ class Command(BaseCommand):
             print "You searched for "+query
             d=DuckDuckGoIO()
             s=Slideshare()
-            engines=[d,s]
+            deli = Delicious()
+
+            engines=[deli]
             for engine in engines:
                 links=engine.search(query)
                 #for index in range(len(links)):
@@ -41,7 +43,9 @@ class Command(BaseCommand):
             url=options['URL']
             print "You want to add: "+url
             results=[url]
+
         for l in results:
+            print l
             r=createResource(l)
 
 def createResource(url):
@@ -55,7 +59,6 @@ def createResource(url):
             r=r[0]
         else:
             g = Goose()
-            print url
             try:
                 a= g.extract(url=url)   
             except:

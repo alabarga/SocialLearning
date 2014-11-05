@@ -7,6 +7,8 @@ import json
 import time
 from urlunshort import resolve
 
+
+
 class SearchEngine(object):
 
     def __init__(self, engine):
@@ -22,6 +24,23 @@ class SearchEngine(object):
             i+=1
             print i
         return furl
+
+
+class Delicious(SearchEngine):
+
+    def __init__(self):
+        super(Delicious, self).__init__("delicious")
+
+    #Busca en google con los parametros que se pasen
+    def search(self,query):
+
+        url="http://feeds.delicious.com/v2/json/tag/3dprinting?count=100"
+        response=urllib2.urlopen(url)
+        resp=json.loads(response.read())
+        links=[]
+        for res in resp:
+            links.insert(0,res["u"])
+        return links                
 
 class Google(SearchEngine):
     def __init__(self):
