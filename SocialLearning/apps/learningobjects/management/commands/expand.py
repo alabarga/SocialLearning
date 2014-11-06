@@ -12,6 +12,7 @@ import hashlib
 import json
 import re
 from urlunshort import resolve
+from django.core.management import call_command
 #####TWITTER KEYS#####
 CONSUMER_KEY = 'ieZUZgZrSJJE0QLBBOsgXg'
 CONSUMER_SECRET = 'PlIpSrh6unKYZISSDieBIFAB3D9f6aSh4p4Dmcn8Q'
@@ -41,6 +42,16 @@ class Command(BaseCommand):
                 resources=Resource.objects.filter(status=Resource.DISCOVERED)
                 for res in resources:
                     url=res.url
+                    mentions=Mention.objects.filter(resource=res)
+                    print "Para la url "+url+" tenemos las siguientes urls relacionadas:"
+                    for mention in mentions:
+                        sp=mention.profile
+                        sn=sp.social_network
+                        tags=res.tags.all()#tienen que ser de la mencion
+                        #user="GontzalYrth"#getuser
+                        #user2="yrthgze"
+                        for tag in tags:
+                            get_expand(url,sp.username,tag,sn.name)
                     #res.status=Resource.DISCOVERED
                     res.save()
                     print "Updated.."
@@ -61,7 +72,7 @@ class Command(BaseCommand):
                 #user2="yrthgze"
                 for tag in tags:
                     get_expand(url,sp.username,tag,sn.name)
-                #resource.update(status=Resource.EXPANDED)
+            #resource.update(status=Resource.EXPANDED)
 
 def get_expand(url,user,tag,social_network):
     tagl=[]
@@ -78,33 +89,28 @@ def get_expand(url,user,tag,social_network):
                 #relatedToTweet.append(tweet)
                 ##mirar si en el texto hay enlaces
                 ##para cada enlace dle texto
-                links= extract_urls(str(tweet.text))
+                links= extract_urls(tweet.text.encode('utf-8'))
                 for link in links:
                     link=resolve(link)
                     if link!=url:
                         print link
                         print "Fecha: "+str(tweet.created_at)
+                        call_command('add',URL=link)
         print "__________________________"
         print ""
-        """for link in links:
-                    Resource=self.createResource(link,firsturl,1)
-                    try:
-                        resources.insert(Resource)
-                        print "Succesfully inserted related resource twitter"
-                    except:
-                        print "Something went wrong you silly boy in related twitter"""
-    elif social_network=="delicious":    
+    elif social_network=="delicious":  
+        print"----------------------------"  
         print "En delicious para el usuario "+user+" y tag "+str(tag)+": "
-        firsturl=url
-        url="http://feeds.delicious.com/v2/json/"+str(user)+"/"+urllib2.quote(str(tag),'') 
-        response=urllib2.urlopen(url)
-        resp=json.loads(response.read())
-        for res in resp:
-            if firsturl!=str(res["u"]):
+        url_to_call="http://feeds.delicious.com/v2/json/"+str(user)+"/"+urllib2.quote(str(tag),'') 
+        response=urllib2.urlopen(url_to_call)
+        response=json.loads(response.read())
+        for res in response:
+            if url!=str(res["u"]):
                 print str(res["u"])
                 print "Fecha: "+res["dt"]
-        print ""
-                
+                call_command('add',URL=str(res["u"]))
+        print "__________________________"
+        print ""     
     else:
         print "Este enlace no tiene nada de twitter ni deli"
     
