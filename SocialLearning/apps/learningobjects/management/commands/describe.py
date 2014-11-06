@@ -69,23 +69,23 @@ def get_def(url,worksheet,r):
         response=red_par.get_article_content(url.encode('utf-8')).content
     except:
         response=None
-"""
-[u'content',
- u'domain',
- u'author',
- u'url',
- u'short_url',
- u'title',
- u'excerpt',
- u'direction',
- u'word_count',
- u'total_pages',
- u'next_page_id',
- u'dek',
- u'lead_image_url',
- u'rendered_pages',
- u'date_published']
-"""
+    """
+    [u'content',
+     u'domain',
+     u'author',
+     u'url',
+     u'short_url',
+     u'title',
+     u'excerpt',
+     u'direction',
+     u'word_count',
+     u'total_pages',
+     u'next_page_id',
+     u'dek',
+     u'lead_image_url',
+     u'rendered_pages',
+     u'date_published']
+    """
 
     #Goose
     g = Goose()
@@ -94,30 +94,30 @@ def get_def(url,worksheet,r):
     except:
         a=None
 
-"""
-goose.article.Article()
+    """
+    goose.article.Article()
 
- 'additional_data',
- 'canonical_link',
- 'cleaned_text',
- 'doc',
- 'domain',
- 'final_url',
- 'link_hash',
- 'meta_description',
- 'meta_favicon',
- 'meta_keywords',
- 'meta_lang',
- 'movies',
- 'publish_date',
- 'raw_doc',
- 'raw_html',
- 'tags',
- 'title',
- 'top_image',
- 'top_node']
+     'additional_data',
+     'canonical_link',
+     'cleaned_text',
+     'doc',
+     'domain',
+     'final_url',
+     'link_hash',
+     'meta_description',
+     'meta_favicon',
+     'meta_keywords',
+     'meta_lang',
+     'movies',
+     'publish_date',
+     'raw_doc',
+     'raw_html',
+     'tags',
+     'title',
+     'top_image',
+     'top_node']
 
-"""
+    """
     summaries=SummarizeUrl(url.encode('utf-8'))
     print summaries
 
@@ -134,12 +134,12 @@ goose.article.Article()
             rowData=[key,""]
         data.append(rowData)
 
-"""
-    feeds=feedfinder.feeds(url+"feed")
-    i=0
-    for f in feeds:
-        data.append(["feed"+str(i),f])
-"""
+    """
+        feeds=feedfinder.feeds(url+"feed")
+        i=0
+        for f in feeds:
+            data.append(["feed"+str(i),f])
+    """
 
     feed=feedfinder.feed(url)
     if feed:
