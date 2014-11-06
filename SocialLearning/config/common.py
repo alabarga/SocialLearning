@@ -305,3 +305,6 @@ class Common(Configuration):
     SUIT_CONFIG = {
         'ADMIN_NAME': 'Administración'
     }
+
+    REDACTOR_OPTIONS = {'lang': 'es'}
+    REDACTOR_UPLOAD = 'uploads/'

@@ -33,6 +33,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable avatars
     url(r'^avatar/', include('avatar.urls')),
 
+    url(r'^redactor/', include('redactor.urls')), 
+    
     url(r'^k/', include('learningobjects.urls')),
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

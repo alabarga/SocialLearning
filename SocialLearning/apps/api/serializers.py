@@ -4,18 +4,20 @@ from learningobjects.models import *
 
 class ResourceSerializer(serializers.HyperlinkedModelSerializer):
 
-    relevance = serializers.SerializerMethodField('get_relevance')
-    def get_relevance(self, obj):
-        return obj.get_relevance('3Dprinting')
+    interest = serializers.SerializerMethodField('get_relevance')
+    mentions = serializers.HyperlinkedIdentityField(view_name='mention-detail')
+
+    def get_interest(self, obj):
+        return obj.get_interest('3Dprinting')
 
     class Meta:
         model = Resource
-        fields = ('id', 'identifier', 'title', 'url', 'relevance')
+        fields = ('id', 'title', 'description', 'url', 'interest', 'mentions')
 
 
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 
-    resources = serializers.HyperlinkedRelatedField(many=True, view_name='resource-detail')
+    resources = serializers.HyperlinkedIdentityField(view_name='resource-detail')
     class Meta:
         model = Collection
         fields = ('name','resources')        

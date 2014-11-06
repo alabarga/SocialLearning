@@ -1,6 +1,7 @@
 from django.db import models
 from taggit.managers import TaggableManager
 from redactor.fields import RedactorField
+import random 
 
 # Create your models here.
 
@@ -19,10 +20,10 @@ class SocialProfile(models.Model):
     descripcion = RedactorField(null=True, blank=True)
 
     def get_interest(self):
-        return 0.5
+        return round(random.uniform(0, 1) * 100) / 100.0
 
     def get_relevance(self, topic):
-        return 0.5
+        return round(random.uniform(0, 1) * 100) / 100.0
         
     def __unicode__(self):
         return self.username + '@' + str(self.social_network)
