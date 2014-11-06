@@ -46,28 +46,31 @@ class Command(BaseCommand):
                     print "Updated.."
         else:
             url=options['URL']
-            print url
             try:
                 resource=Resource.objects.get(url=url,status=Resource.DISCOVERED)
             except:
                 print "That link is not in the database or is not with ´Described´ status. Add it first (python manage.py add -u "+url+")"
             #para cada mencion conseguir usuario y tags y hacer:
-            user="GontzalYrth"#getuser
-            user2="yrthgze"
-            tags=resource.tags.all()
+            mentions=Mention.objects.filter(resource=resource)
             print "Para la url "+url+" tenemos las siguientes urls relacionadas:"
-            for tag in tags:
-                get_expand(url,user,tag,"twitter")
-                get_expand(url,user2,tag,"delicious")
-            #resource.update(status=Resource.EXPANDED)
+            for mention in mentions:
+                sp=mention.profile
+                sn=sp.social_network
+                tags=resource.tags.all()#tienen que ser de la mencion
+                #user="GontzalYrth"#getuser
+                #user2="yrthgze"
+                for tag in tags:
+                    get_expand(url,sp.username,tag,sn.name)
+                #resource.update(status=Resource.EXPANDED)
 
 def get_expand(url,user,tag,social_network):
     tagl=[]
     tagl.append(str(tag))
     relatedToTweet=[]        
-    if social_network=="twitter":
+    if social_network=="Twitter":
+        print"----------------------------"
         print "En twitter para el usuario "+user+" y tag "+str(tag)+": "
-        response=twittApi.user_timeline(user=user,count=10)
+        response=twittApi.user_timeline(screen_name=user,count=10)
         for tweet in response:
             ht=extract_hash_tags(tweet.text)           
             intersect=list(set(tagl) & set(ht))
@@ -81,6 +84,7 @@ def get_expand(url,user,tag,social_network):
                     if link!=url:
                         print link
                         print "Fecha: "+str(tweet.created_at)
+        print "__________________________"
         print ""
         """for link in links:
                     Resource=self.createResource(link,firsturl,1)
