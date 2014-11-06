@@ -18,15 +18,14 @@ red_par=readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
 class Command(BaseCommand):
     args = 'query'
     help = 'Expandir el numero de documentos'
-    
+    """make_option('-v','--verbose',
+            dest='verbose',
+            help='verbose'),"""
 
     option_list = BaseCommand.option_list + (
         make_option('-u','--url',
             dest='URL',
             help='URL del recurso'),
-        make_option('-v','--verbose',
-            dest='verbose',
-            help='verbose'),
         make_option('-x','--excel',
             dest='excel',
             help='Create Excel output'),        
@@ -37,6 +36,7 @@ class Command(BaseCommand):
         row=0
         workbook = xlsxwriter.Workbook('data.xlsx')
         worksheet = workbook.add_worksheet()
+        #options['verbosity'] tiene el verbose
         if options['URL'] == None:   
             inp=raw_input("This will describe EVERY Resource with ´Added´ status on the database. Are you sure(y/n)?:")
             inp=inp.lower()
@@ -140,8 +140,11 @@ def get_def(url,worksheet,r):
         for f in feeds:
             data.append(["feed"+str(i),f])
     """
-
-    feed=feedfinder.feed(url)
+    feed=None
+    try:
+        feed=feedfinder.feed(url)
+    except:
+        pass
     if feed:
         data.append(["feed",feed])
 
@@ -153,7 +156,7 @@ def get_def(url,worksheet,r):
         worksheet.write(row, col + 1, d)
         row += 1
     worksheet.write(row, col,"  ")
-    add_feed(feeds)
+    #add_feed(feeds)#
 
 def getAtrib(res):
     keys=['domain','author','url','short_url','title','excerpt','date_published']
