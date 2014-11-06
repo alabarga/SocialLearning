@@ -96,14 +96,15 @@ def getMentions(url,resource):
                 tags.insert(0,ht)
             inner_t.append(ht)
         #print "En Twitter, Usuario: "+author+", Tags: "+", ".join(inner_t)+", Fecha: "+str(r.created_at)
-        sn=createInstance("SocialNetwork",name="Twitter",url="http://twitter.com")
-        sp=createInstance("SocialProfile",username=author,sn=sn,user_url="http://twitter.com/"+str(author))
-        m=createInstance("Mention",sp=sp,resource=resource)
+        sn=SocialNetwork.objects.get_or_create(name="Twitter",url="http://twitter.com")[0]
+        sp=SocialProfile.objects.get_or_create(username=author,social_network=sn,url="http://twitter.com/"+str(author))
+        m=Mention.objects.get_or_create(profile=sp[0],resource=resource)[0]
+        m.tags.add("")
     return authors, tags
 
 def extract_hash_tags(s):
     return set(part[1:] for part in s.split() if part.startswith('#'))
-
+"""
 def createInstance(model,**kwargs):
     if model=="SocialNetwork":
         sn=SocialNetwork.objects.filter(name=kwargs["name"])
@@ -128,4 +129,4 @@ def createInstance(model,**kwargs):
         else:
             m=m[0]
             print "Esa mencion ya estaba"
-        return m
+        return m"""

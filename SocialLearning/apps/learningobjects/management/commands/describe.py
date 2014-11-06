@@ -18,7 +18,9 @@ red_par=readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
 class Command(BaseCommand):
     args = 'query'
     help = 'Expandir el numero de documentos'
-    
+    """make_option('-v','--verbose',
+            dest='verbose',
+            help='verbose'),"""
 
     option_list = BaseCommand.option_list + (
         make_option('-u','--url',
@@ -147,9 +149,8 @@ def describe(url):
             rowData=[key,""]
         data.append(rowData)
 
+
     return data
-
-
 
 def getAtrib(res):
     keys=['domain','author','url','short_url','title','excerpt','date_published']
