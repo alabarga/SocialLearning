@@ -1,5 +1,7 @@
 #-*- coding: UTF-8 -*-
 from learningobjects.utils.search import *
+from learningobjects.utils import feedfinder
+import feedparser
 from django.core.management.base import BaseCommand, CommandError
 from learningobjects.models import *
 from optparse import make_option
@@ -97,6 +99,8 @@ def get_expand(url,user,tag,social_network):
                         print link
                         print "Fecha: "+str(tweet.created_at)
                         call_command('add',URL=link)
+                        feed=feedfinder.feed(link)
+                        add_feed(feed)
         print "__________________________"
         print ""
     elif social_network=="delicious":  
@@ -110,6 +114,8 @@ def get_expand(url,user,tag,social_network):
                 print str(res["u"])
                 print "Fecha: "+res["dt"]
                 call_command('add',URL=str(res["u"]))
+                feed=feedfinder.feed(str(res["u"]))
+                add_feed(feed)
         print "__________________________"
         print ""     
     else:
