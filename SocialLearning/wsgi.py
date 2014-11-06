@@ -20,7 +20,8 @@ import os
 # mod_wsgi daemon mode with each site in its own daemon process, or use
 # os.environ["DJANGO_SETTINGS_MODULE"] = ".settings"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config")
-os.environ.setdefault("DJANGO_CONFIGURATION", "Production")
+os.environ.setdefault("DJANGO_CONFIGURATION", "Local")
+os.environ.setdefault("DJANGO_SECRET_KEY", "l2gp7#914p!91#bb7t^dxj0ol2-0_6ubn@o3wj(np6w8hzoky-")
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION

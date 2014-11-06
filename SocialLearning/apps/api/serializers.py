@@ -4,7 +4,7 @@ from learningobjects.models import *
 
 class ResourceSerializer(serializers.HyperlinkedModelSerializer):
 
-    interest = serializers.SerializerMethodField('get_relevance')
+    interest = serializers.SerializerMethodField('get_interest')
     mentions = serializers.HyperlinkedIdentityField(view_name='mention-detail')
 
     def get_interest(self, obj):
