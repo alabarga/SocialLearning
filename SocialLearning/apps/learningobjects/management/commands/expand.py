@@ -47,7 +47,7 @@ class Command(BaseCommand):
                     for mention in mentions:
                         sp=mention.profile
                         sn=sp.social_network
-                        tags=res.tags.all()#tienen que ser de la mencion
+                        tags=mention.tags.all()#tienen que ser de la mencion
                         #user="GontzalYrth"#getuser
                         #user2="yrthgze"
                         for tag in tags:
@@ -67,7 +67,8 @@ class Command(BaseCommand):
             for mention in mentions:
                 sp=mention.profile
                 sn=sp.social_network
-                tags=resource.tags.all()#tienen que ser de la mencion
+                tags=mention.tags.all()#tienen que ser de la mencion
+                print tags
                 #user="GontzalYrth"#getuser
                 #user2="yrthgze"
                 for tag in tags:

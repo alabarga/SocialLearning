@@ -99,7 +99,8 @@ def getMentions(url,resource):
         sn=SocialNetwork.objects.get_or_create(name="Twitter",url="http://twitter.com")[0]
         sp=SocialProfile.objects.get_or_create(username=author,social_network=sn,url="http://twitter.com/"+str(author))
         m=Mention.objects.get_or_create(profile=sp[0],resource=resource)[0]
-        m.tags.add("")
+        for tag in inner_t:
+            m.tags.add(tag)
     return authors, tags
 
 def extract_hash_tags(s):
