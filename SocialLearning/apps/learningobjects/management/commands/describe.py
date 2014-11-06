@@ -25,18 +25,18 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('-u','--url',
             dest='URL',
-            help='URL del recurso'),
-        make_option('-x','--excel',
-            dest='excel',
-            help='Create Excel output'),        
+            help='URL del recurso'),      
         ) 
 
     def handle(self, *args, **options):
         results=[]
-        row=0
-        workbook = xlsxwriter.Workbook('data.xlsx')
-        worksheet = workbook.add_worksheet()
-        #options['verbosity'] tiene el verbose
+        xls = False
+
+        if xls:
+            workbook = xlsxwriter.Workbook('data.xlsx')
+            worksheet = workbook.add_worksheet()
+            row=0
+
         if options['URL'] == None:   
             inp=raw_input("This will describe EVERY Resource with ´Added´ status on the database. Are you sure(y/n)?:")
             inp=inp.lower()
@@ -44,11 +44,29 @@ class Command(BaseCommand):
                 resources=Resource.objects.filter(status=Resource.ADDED)
                 for res in resources:
                     url=res.url
-                    get_def(url,worksheet,row)
-                    row+=1
+                    data = describe(url)
+
+                    res.title = data.title
+                    res.description = data.excerpt
+                    # res.author =                    
                     res.status=Resource.DESCRIBED
                     res.save()
-                    print "Updated.."
+
+                    if xls:
+                        row = r*18
+                        col = 0
+                        worksheet.write(row, col,"Described for url: "+url)
+                        row+=1
+                        # Iterate over the data and write it out row by row.
+                        for item, d in (data):
+                            worksheet.write(row, col,item)
+                            worksheet.write(row, col + 1, d)
+                            row += 1
+                        worksheet.write(row, col,"  ")
+
+                if xls:
+                        workbook.close()
+
         else:
             url=options['URL']
             resource=Resource.objects.filter(url=url,status=Resource.ADDED)
@@ -58,11 +76,9 @@ class Command(BaseCommand):
                 resource.update(status=Resource.DESCRIBED)
             else:
                 print "That link is not in the database or is not with ´Added´ status. Add it first (python manage.py add -u "+url+")"
-        workbook.close()
 
-def get_def(url,worksheet,r):
-    row = r*18
-    col = 0
+
+def describe(url):
 
     # Readability
     try:
@@ -119,7 +135,6 @@ def get_def(url,worksheet,r):
 
     """
     summaries=SummarizeUrl(url.encode('utf-8'))
-    print summaries
 
     response=getAtrib(response)
     data=[]
@@ -134,29 +149,8 @@ def get_def(url,worksheet,r):
             rowData=[key,""]
         data.append(rowData)
 
-    """
-        feeds=feedfinder.feeds(url+"feed")
-        i=0
-        for f in feeds:
-            data.append(["feed"+str(i),f])
-    """
-    feed=None
-    try:
-        feed=feedfinder.feed(url)
-    except:
-        pass
-    if feed:
-        data.append(["feed",feed])
 
-    worksheet.write(row, col,"Described for url: "+url)
-    row+=1
-    # Iterate over the data and write it out row by row.
-    for item, d in (data):
-        worksheet.write(row, col,item)
-        worksheet.write(row, col + 1, d)
-        row += 1
-    worksheet.write(row, col,"  ")
-    #add_feed(feeds)#
+    return data
 
 def getAtrib(res):
     keys=['domain','author','url','short_url','title','excerpt','date_published']

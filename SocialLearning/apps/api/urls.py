@@ -6,5 +6,5 @@ router = routers.DefaultRouter()
 router.register(r'resources', views.ResourceViewSet)
 
 urlpatterns = patterns('',
-    url(r'^', include(router.urls)),
+    url(r'', include(router.urls)),
 )
