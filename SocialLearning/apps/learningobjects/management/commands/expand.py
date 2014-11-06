@@ -103,7 +103,22 @@ def get_expand(url,user,tag,social_network):
                 
     else:
         print "Este enlace no tiene nada de twitter ni deli"
-        
+    
+"""
+    feeds=feedfinder.feeds(url+"feed")
+    i=0
+    for f in feeds:
+        data.append(["feed"+str(i),f])
+"""
+"""
+    feed=feedfinder.feed(url)
+    if feed:
+        data.append(["feed",feed])
+
+
+    add_feed(feeds)
+
+"""
 
 def extract_hash_tags(s):
     return set(part[1:] for part in s.split() if part.startswith('#'))

@@ -37,8 +37,17 @@ urlpatterns = patterns('',
 
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    url(r'^api/', include('api.urls', namespace='api')),
-
     url(r'^api-docs/', include('rest_framework_swagger.urls')), 
      
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+from rest_framework import routers
+from api import views
+
+router = routers.DefaultRouter()
+router.register(r'resources', views.ResourceViewSet)
+router.register(r'collections', views.CollectionViewSet)
+
+urlpatterns += patterns('',
+    url(r'api/', include(router.urls)),
+)

@@ -13,3 +13,10 @@ class ResourceViewSet(viewsets.ModelViewSet):
     """
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
+
+class CollectionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer    
