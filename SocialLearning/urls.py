@@ -49,6 +49,8 @@ from api import views
 router = routers.DefaultRouter()
 router.register(r'resources', views.ResourceViewSet)
 router.register(r'collections', views.CollectionViewSet)
+router.register(r'mentions', views.MentionViewSet)
+router.register(r'profiles', views.ProfileViewSet)
 
 urlpatterns += patterns('',
     url(r'api/', include(router.urls)),

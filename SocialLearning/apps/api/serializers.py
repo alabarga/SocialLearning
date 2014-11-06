@@ -14,13 +14,28 @@ class ResourceSerializer(serializers.HyperlinkedModelSerializer):
         model = Resource
         fields = ('id', 'title', 'description', 'url', 'interest', 'mentions')
 
-
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 
     resources = serializers.HyperlinkedIdentityField(view_name='resource-detail')
     class Meta:
         model = Collection
         fields = ('name','resources')        
+
+class ProfileSerializer(serializers.HyperlinkedModelSerializer):
+    
+    social_network = serializers.RelatedField()
+    class Meta:
+        model = SocialProfile
+        fields = ('social_network', 'username',)
+
+class MentionSerializer(serializers.HyperlinkedModelSerializer):
+
+    profile = serializers.RelatedField()
+    resource = serializers.HyperlinkedRelatedField(view_name='resource-detail')
+
+    class Meta:
+        model = Mention
+        fields = ('profile','resource')          
 
 
 
