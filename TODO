@@ -32,3 +32,9 @@ SocialProfile
             users[r.user.screen_name]=1
         else:
             users[r.user.screen_name]+=1
+
+
+
+Feeds:
+Si son subcategorias de la pagina en cuestion mirar si tiene feed la subcategoria
+Si son articulos evaluar si interesa obtener el feed de comentarios
