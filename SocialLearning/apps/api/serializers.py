@@ -8,7 +8,7 @@ class ResourceSerializer(serializers.HyperlinkedModelSerializer):
     mentions = serializers.HyperlinkedIdentityField(view_name='mention-detail')
 
     def get_interest(self, obj):
-        return obj.get_interest('3Dprinting')
+        return obj.get_interest()
 
     class Meta:
         model = Resource
