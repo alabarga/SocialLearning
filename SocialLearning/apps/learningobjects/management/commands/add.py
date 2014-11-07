@@ -32,8 +32,9 @@ class Command(BaseCommand):
             d=DuckDuckGoIO()
             s=Slideshare()
             deli = Delicious()
+            yahoo=Yahoo()
 
-            engines=[deli]
+            engines=[yahoo]
             for engine in engines:
                 links=engine.search(query)
                 #for index in range(len(links)):

@@ -34,7 +34,7 @@ class Delicious(SearchEngine):
     #Busca en google con los parametros que se pasen
     def search(self,query):
 
-        url="http://feeds.delicious.com/v2/json/tag/3dprinting?count=100"
+        url="http://feeds.delicious.com/v2/json/tag/"+query+"?count=100"
         response=urllib2.urlopen(url)
         resp=json.loads(response.read())
         links=[]
@@ -114,4 +114,21 @@ class Slideshare(SearchEngine):
                     links.insert(0,link)
             except:
                 pass   
-        return links     
+        return links    
+
+class Yahoo(SearchEngine):
+    
+    def __init__(self):
+        super(Yahoo, self).__init__("yahoo")
+
+    def search(self,query):
+        url='http://pipes.yahoo.com/pipes/pipe.run?_id=nHNB8TJm3BGumlGA9YS63A&_render=json&searchInput='+query
+        res=urllib2.urlopen(url)
+        res=res.read()
+        res=json.loads(res)
+        response=res["value"].values()[3]#los resultados
+        links=[]
+        for r in response:
+            if r["link"] not in links:
+                links.append(r["link"])
+        return links

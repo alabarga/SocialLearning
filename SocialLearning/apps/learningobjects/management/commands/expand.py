@@ -98,9 +98,12 @@ def get_expand(url,user,tag,social_network):
                     if link!=url:
                         print link
                         print "Fecha: "+str(tweet.created_at)
-                        call_command('add',URL=link)
+                        #call_command('add',URL=link)
                         feed=feedfinder.feed(link)
-                        add_feed(feed)
+                        print feed
+                        if feed: 
+                            rc=ResourceContainer.objects.get_or_create(rss=feed,url=link)
+                            add_feed(feed)
         print "__________________________"
         print ""
     elif social_network=="delicious":  
@@ -115,7 +118,9 @@ def get_expand(url,user,tag,social_network):
                 print "Fecha: "+res["dt"]
                 call_command('add',URL=str(res["u"]))
                 feed=feedfinder.feed(str(res["u"]))
-                add_feed(feed)
+                if feed:
+                    rc=ResourceContainer.objects.get_or_create(rss=feed,url=str(res["u"]))
+                    add_feed(feed)
         print "__________________________"
         print ""     
     else:
