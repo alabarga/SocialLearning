@@ -71,8 +71,22 @@ class Command(BaseCommand):
             url=options['URL']
             resource=Resource.objects.filter(url=url,status=Resource.ADDED)
             if len(resource)>0:
-                get_def(url,worksheet,row)
-                row+=1
+                describe(url)
+                if xls:
+                        row = r*18
+                        col = 0
+                        worksheet.write(row, col,"Described for url: "+url)
+                        row+=1
+                        # Iterate over the data and write it out row by row.
+                        for item, d in (data):
+                            worksheet.write(row, col,item)
+                            worksheet.write(row, col + 1, d)
+                            row += 1
+                        worksheet.write(row, col,"  ")
+
+                if xls:
+                        workbook.close()
+
                 resource.update(status=Resource.DESCRIBED)
             else:
                 print "That link is not in the database or is not with ´Added´ status. Add it first (python manage.py add -u "+url+")"
