@@ -38,6 +38,13 @@ class ResourceContainer(models.Model):
     def __unicode__(self):
         return self.url 
 
+class Topic(models.Model): 
+    name = models.CharField(max_length=255)
+    tags = TaggableManager()    
+
+    def __unicode__(self):
+        return self.name
+
 class Resource(models.Model):
 
     ADDED = 0;
@@ -58,6 +65,7 @@ class Resource(models.Model):
     container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
     description = RedactorField(null=True, blank=True)    
     seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
+    relevant = models.ManyToManyField(Topic, null=True, blank=True, related_name='resources', through='Relevance')
     last_processed = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
     tags = TaggableManager()
@@ -87,12 +95,20 @@ class Collection(models.Model):
 
 class Mention(models.Model): 
     profile = models.ForeignKey(SocialProfile,related_name="mentions",)
-    resource = models.ForeignKey(Resource,related_name="mention",)
+    resource = models.ForeignKey(Resource,related_name="mentions",)
     card = RedactorField(null=True, blank=True)
     tags = TaggableManager()
 
     def __unicode__(self):
-        return "%s by %s" % (self.resource, self.profile)
+        return u"%s by %s" % (self.resource, self.profile)
+
+class Relevance(models.Model): 
+    resource = models.ForeignKey(Resource,related_name="topics",) 
+    topic = models.ForeignKey(Topic,related_name="relevance",)     
+    score = models.FloatField()
+
+    def __unicode__(self):
+        return u"%s scores %f at %s" % (self.resource, self.score, self.topic)
 
 class Scores(models.Model): 
     resource = models.ForeignKey(Resource,related_name="scores",) 
@@ -100,4 +116,4 @@ class Scores(models.Model):
     score = models.FloatField()
 
     def __unicode__(self):
-        return "%s scores %f at %s" % (self.resource, self.score, self.topic)
+        return u"%s scores %f at %s" % (self.resource, self.score, self.topic)

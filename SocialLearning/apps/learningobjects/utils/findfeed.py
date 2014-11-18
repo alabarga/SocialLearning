@@ -1,8 +1,12 @@
-#!/usr/local/bin/python3.3
+#!/usr/bin/env python
+# encoding: utf-8
+
 from bs4 import BeautifulSoup as bs4
 import requests
 import feedparser
 import urllib.parse
+
+# http://nombredelblog.blogspot.com/feeds/posts/default?alt=rss
 
 def findfeed(site):
     raw = requests.get(site).text

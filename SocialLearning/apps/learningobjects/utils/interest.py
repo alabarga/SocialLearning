@@ -16,12 +16,48 @@ auth = OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
 auth.set_access_token(OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
 twittApi = tweepy.API(auth)
 
+# { u'StumbleUpon': 0, 
+#   u'Reddit': 0, 
+#   u'GooglePlusOne': 0, 
+#   u'Pinterest': 0, 
+#   u'Twitter': 0, 
+#   u'Diggs': 0, 
+#   u'LinkedIn': 0, 
+#   u'Facebook': { u'commentsbox_count': 0, 
+#                  u'click_count': 0, 
+#                  u'total_count': 0, 
+#                  u'comment_count': 0, 
+#                  u'like_count': 0, 
+#                  u'share_count': 0 }, 
+#  u'Delicious': 0, 
+#  u'Buzz': 0
+# }
+
 class Interest(object):
+
+
+    def __init__(self):
+        
+        self.factores = {'LinkedIn': 2, 'Twitter': 2, 'Delicious':2 } 
+        self.suma = sum(self.factores.values())
+        for key in self.factores.keys():
+            self.factores[key] = self.factores[key] / self.suma        
 
     def get_interest_count(self,url):
         response=urllib2.urlopen('http://free.sharedcount.com/?url='+url+'&apikey=cabec5c5d636b063cbbcf8cbe966fd3c4c7d9152')
         res=json.loads(response.read())
         return res
+
+    def get_interest(self,url):
+
+        data = self.get_interest_count(url)
+
+        url_interest = 0
+       
+        for key in self.factores.keys():
+            url_interest += data[key] * self.factores[key] / suma
+
+        return url_interest 
 
     def get_count(self,url,social_network):
         print "hola"

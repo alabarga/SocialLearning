@@ -8,6 +8,8 @@ admin.site.register(Resource)
 admin.site.register(Collection)
 admin.site.register(SocialNetwork)
 admin.site.register(Mention)
+admin.site.register(Topic)
+admin.site.register(Relevance)
 admin.site.register(SocialProfile)
 
 
