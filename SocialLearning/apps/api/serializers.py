@@ -18,11 +18,11 @@ class TagListSerializer(serializers.WritableField):
 class ResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     interest = serializers.SerializerMethodField('get_interest')
-    
+
     mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                    view_name='mention-detail')
 
-    relevance = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+    topics = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                     view_name='relevance-detail')
 
     def get_interest(self, obj):
@@ -30,7 +30,7 @@ class ResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Resource
-        fields = ('id', 'title', 'description', 'url', 'interest', 'mentions', 'relevance')
+        fields = ('id', 'title', 'description', 'url', 'interest', 'mentions', 'topics')
 
 
 class ResourceIdSerializer(serializers.HyperlinkedModelSerializer):
@@ -46,7 +46,7 @@ class RelevanceSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Relevance
-        fields = ('resource', 'score')  
+        fields = ('resource', 'topic', 'score')  
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
 

@@ -52,6 +52,7 @@ router.register(r'collections', views.CollectionViewSet)
 router.register(r'mentions', views.MentionViewSet)
 router.register(r'profiles', views.ProfileViewSet)
 router.register(r'topics', views.TopicViewSet)
+router.register(r'relevance', views.RelevanceViewSet)
 
 urlpatterns += patterns('',
     url(r'api/', include(router.urls)),

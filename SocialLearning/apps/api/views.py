@@ -41,3 +41,10 @@ class ProfileViewSet(viewsets.ModelViewSet):
     """
     queryset = SocialProfile.objects.all()
     serializer_class = ProfileSerializer         
+
+class RelevanceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Relevance.objects.all()
+    serializer_class = RelevanceSerializer      
