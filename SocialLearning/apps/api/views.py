@@ -46,5 +46,14 @@ class RelevanceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
-    queryset = Relevance.objects.all()
-    serializer_class = RelevanceSerializer      
+    queryset = Relevance.objects.all().order_by('-score')
+    serializer_class = RelevanceSerializer   
+
+class DualSerializerViewSet(viewsets.ModelViewSet):
+    queryset = Resource.objects.all()
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ResourceListSerializer
+        if self.action == 'retrieve':
+            return ResourceDetailSerializer
+        return ResourceDetailSerializer # I dont' know what you want for create/destroy/update       

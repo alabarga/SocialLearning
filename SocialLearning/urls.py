@@ -47,7 +47,7 @@ from rest_framework import routers
 from api import views
 
 router = routers.DefaultRouter()
-router.register(r'resources', views.ResourceViewSet)
+router.register(r'resources', views.DualSerializerViewSet)
 router.register(r'collections', views.CollectionViewSet)
 router.register(r'mentions', views.MentionViewSet)
 router.register(r'profiles', views.ProfileViewSet)

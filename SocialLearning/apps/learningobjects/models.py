@@ -98,6 +98,10 @@ class Resource(models.Model):
         self.identifier = "" # sha1
         super(Resource, self).save(*args, **kwargs)
 
+    @property
+    def topic_list(self):
+        return [t.name for t in self.relevant.all()]
+
 class Collection(models.Model):
     name = models.CharField(max_length=255)
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collections")
@@ -118,6 +122,9 @@ class Relevance(models.Model):
     resource = models.ForeignKey(Resource,related_name="topics",) 
     topic = models.ForeignKey(Topic,related_name="relevance",)     
     score = models.FloatField(default=0.0)
+
+    class Meta:
+        ordering = ['-score']
 
     def __unicode__(self):
         return u"%s scores %f at %s" % (self.resource, self.score, self.topic)
