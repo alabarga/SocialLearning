@@ -11,7 +11,6 @@ try:
 except:
     pass
 
-
 class Result(object):
     
     def __init__(self, request):

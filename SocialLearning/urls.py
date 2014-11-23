@@ -11,9 +11,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+
     url(r'^$',  # noqa
         TemplateView.as_view(template_name='pages/home.html'),
         name="home"),
+
     url(r'^about/$',
         TemplateView.as_view(template_name='pages/about.html'),
         name="about"),
@@ -23,15 +25,13 @@ urlpatterns = patterns('',
 
     # User management
     url(r'^users/', include("users.urls", namespace="users")),
+
     url(r'^accounts/', include('allauth.urls')),
 
     # Uncomment the next line to enable avatars
     url(r'^avatar/', include('avatar.urls')),
 
     # Your stuff: custom urls go here
-
-    # Uncomment the next line to enable avatars
-    url(r'^avatar/', include('avatar.urls')),
 
     url(r'^redactor/', include('redactor.urls')), 
     

@@ -48,7 +48,8 @@ class Command(BaseCommand):
                 resources=Resource.objects.filter(status=Resource.ADDED)
                 for res in resources:
                     url=res.url
-                    data = ReadibilityParser.describe(url)
+                    res.identifier = 
+                    rp_desc = ReadibilityParser.describe(url)
 
                     res.title = data.title
                     res.description = data.excerpt
@@ -60,6 +61,7 @@ class Command(BaseCommand):
             url=options['URL']
             resource=Resource.objects.filter(url=url,status=Resource.ADDED)
             if len(resource)>0:
+
                 data = ReadibilityParser.describe(url)               
                 resource.update(status=Resource.DESCRIBED)
             else:

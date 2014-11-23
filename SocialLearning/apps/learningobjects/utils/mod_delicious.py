@@ -1,24 +1,21 @@
 #!/usr/bin/python
-import urllib, urllib2, simplejson, re
+import urllib, urllib2, json, re
 import xml.etree.ElementTree as et
-json = simplejson
-debug = True
 
 def apiRequestDelicious(auth, call, args = None):
-	if debug == True: Log("apiRequestDelicious() with call: " + call)
 	headers = { }
 	url = ''
 	if call == 'oauth/token':
-		args = { 'client_id' : auth['delicious_clientid'],
-			'client_secret' : auth['delicious_clientsecret'],
-			'grant_type' : 'credentials',
-			'username' : auth['username'],
-			'password' : auth['password']
+		args = {'client_id' : auth['delicious_clientid'],
+				'client_secret' : auth['delicious_clientsecret'],
+				'grant_type' : 'credentials',
+				'username' : auth['username'],
+				'password' : auth['password']
 		}
 		url = "https://avosapi.delicious.com/api/v1/oauth/token"
-		print url
+
 	else:
-		url = "https://api.del.icio.us/v1/" + call
+		url = "https://avosapi.delicious.com/api/v1/" + call
 		headers = { 'Authorization' : "Bearer " + str(auth) }
 
 	# Prepare request.
@@ -44,15 +41,12 @@ def getDeliciousToken(username, password, delicious_clientid, delicious_clientse
 		}
 		tmp = apiRequestDelicious(auth, 'oauth/token')
 		json_data = json.loads(tmp)
-		#if debug == True: Log("Got Delicious tokendata: " + str(json_data))
 		return json_data['access_token']
 	except Exception, e:
-		if debug == True: Log("getDeliciousToken() failed: " + str(e))
 		return False
 
 def getDeliciousTags(token):
 	try:
-		if debug == True: Log("Using Delicious token: " + token)
 		tmp = apiRequestDelicious(token, "tags/get")
 		tree = et.fromstring(tmp)
 
@@ -65,12 +59,10 @@ def getDeliciousTags(token):
 			tags.append(tag)
 		return tags
 	except Exception, e:
-		if debug == True: Log("getDeliciousTags() failed: " + str(e))
 		return False
 
 def getDeliciousPosts(token):
 	try:
-		if debug == True: Log("Using Delicious token: " + token)
 		tmp = apiRequestDelicious(token, "posts/all")
 		tree = et.fromstring(tmp)
 
@@ -89,7 +81,6 @@ def getDeliciousPosts(token):
 			posts.append(post)
 		return posts
 	except Exception, e:
-		if debug == True: Log("getDeliciousPosts() failed: " + str(e))
 		return False
 
 def countDeliciousMediaWithTag(posts, tagname):
@@ -100,7 +91,6 @@ def countDeliciousMediaWithTag(posts, tagname):
 	return count
 
 def checkDeliciousMediaTag(post, tagname):
-	Log("Checking against tag: " + tagname)
 	if re.match(".* " + tagname + " .*", post['tag'], re.M|re.I) or re.match("^" + tagname + " .*", post['tag'], re.M|re.I) or re.match(".* " + tagname + "$", post['tag'], re.M|re.I):
 		return True
 	else:

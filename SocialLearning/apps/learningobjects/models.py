@@ -69,15 +69,27 @@ class Resource(models.Model):
     last_processed = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
     tags = TaggableManager()
+    _interest = models.FloatField(default=0.0)
+    fulltext = RedactorField(null=True, blank=True) 
 
     def __unicode__(self):
         return self.title
 
-    def get_interest(self):
-        return 0.5
+    @property
+    def interest(self):
+        return self._interest
+
+    @interest.setter
+    def interest(self, value):
+        self._interest = value
 
     def get_relevance(self, topic):
-        return 0.5
+
+        try:
+            rel = Relevance.objects.get(resource=self, topic__name = topic)
+            return rel.score
+        except:
+            return 0.0
 
     def find_mentions(self):
         return self.title
@@ -105,7 +117,7 @@ class Mention(models.Model):
 class Relevance(models.Model): 
     resource = models.ForeignKey(Resource,related_name="topics",) 
     topic = models.ForeignKey(Topic,related_name="relevance",)     
-    score = models.FloatField()
+    score = models.FloatField(default=0.0)
 
     def __unicode__(self):
         return u"%s scores %f at %s" % (self.resource, self.score, self.topic)
@@ -113,7 +125,7 @@ class Relevance(models.Model):
 class Scores(models.Model): 
     resource = models.ForeignKey(Resource,related_name="scores",) 
     topic = models.CharField(max_length=255)
-    score = models.FloatField()
+    score = models.FloatField(default=0.0)
 
     def __unicode__(self):
         return u"%s scores %f at %s" % (self.resource, self.score, self.topic)

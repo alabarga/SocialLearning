@@ -33,8 +33,15 @@ twittApi = tweepy.API(auth)
 #  u'Buzz': 0
 # }
 
-class Interest(object):
+def dictsum(d):
+    suma = 0
+    for k, v in d.iteritems():
+        if isinstance(v, dict):
+            suma += dictsum(v)
+        else:
+            suma += v
 
+class Interest(object):
 
     def __init__(self):
         
@@ -48,14 +55,14 @@ class Interest(object):
         res=json.loads(response.read())
         return res
 
-    def get_interest(self,url):
+    def get_interest(self, url):
 
         data = self.get_interest_count(url)
 
-        url_interest = 0
+        url_interest = dictsum(data)
        
-        for key in self.factores.keys():
-            url_interest += data[key] * self.factores[key] / suma
+        #for key in self.factores.keys():
+        #    url_interest += data[key] * self.factores[key] / suma
 
         return url_interest 
 
@@ -69,26 +76,3 @@ class Interest(object):
         for tp in to_pop:
             data.pop(tp)
         return data
-
-    def get_followers_count(self,user,social_network):
-        if social_network=="Twitter":
-            s=twittApi
-            res=s.get_user(user).followers_count
-            return res
-
-    def get_post_count(self,user,social_network):
-        if social_network=="Twitter":
-            s=twittApi
-            res=s.get_user(user).statuses_count
-            return res
-
-    def get_post_by_user_for_tag(self,tag,social_network):
-        if social_network=="Twitter":
-            a=twittApi.search(q=tag,show_user=True)
-            users={}
-            for r in a:
-                if r.user.screen_name not in users:
-                    users[r.user.screen_name]=1
-                else:
-                    users[r.user.screen_name]+=1
-            return users

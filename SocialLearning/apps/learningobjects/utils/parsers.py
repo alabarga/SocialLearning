@@ -1,6 +1,14 @@
+from __future__ import unicode_literals
+from ftfy import fix_text
+
 import readability
 from goose import Goose
 from pyteaser import SummarizeUrl
+import requests
+
+from learningobjects.utils.pdf import extract_pdf
+
+
 
 ###Readability parser
 
@@ -14,15 +22,29 @@ class dotdict(dict):
 
 class URLObject(object):
 
-    def __init__(self, url):
-        self.url = url
+    @property
+    def available_fields():
+        return self.descriptor.viewkeys()
 
+    @property
+    def headers(self):
+        r = requests.head(self.url)
+        return r.headers
+
+    @property
+    def content_type(self):
+        return self.headers['content-type']
+
+    def __init__(self, url=None):
+        if url != None:
+            self.url = url
+            self.descriptor = dotdict({'url':url})
 
 class ReadibilityParser(URLObject):
 
     parser = readability.ParserClient('03b5d5676456982e868cf57e5b6757f198ef479d')
 
-    def describe(url=None):
+    def describe(self, url=None):
 
         if url == None:
             url = self.url
@@ -32,12 +54,6 @@ class ReadibilityParser(URLObject):
             return
 
         # Readability
-        try:
-            response=self.parser.get_article_content(url.encode('utf-8'))
-            a = dotdict(response.content)
-        except:
-            a = dotdict({'url':url})
-
         """
         [u'content',
          u'domain',
@@ -56,11 +72,18 @@ class ReadibilityParser(URLObject):
          u'date_published']
         """
 
-        return a
+        try:
+            response=self.parser.get_article_content(url.encode('utf-8'))
+            a = dotdict(response.content)
+            self.descriptor.update(a)
+        except:
+            pass
+
+        return self.descriptor
 
 class GooseParser(URLObject):
 
-    def describe(url=None):
+    def describe(self, url=None):
 
         if url == None:
             url = self.url
@@ -70,14 +93,6 @@ class GooseParser(URLObject):
             return
 
         #Goose
-        g = Goose()
-        try:
-            a = g.extract(url=url.encode('utf-8'))  
-        except:
-            a = dotdict({'url':url})
-
-        a.url = url
-
         """
         goose.article.Article()
 
@@ -103,9 +118,19 @@ class GooseParser(URLObject):
 
         """
 
-class TeaserParser(URLObject):
+        g = Goose()
+        try:
+            a = g.extract(url=url.encode('utf-8'))  
+            self.descriptor.update(a)
+        except:
+            pass
 
-    def describe(url=None):        
+        return self.descriptor
+
+
+class SummaryParser(URLObject):
+
+    def describe(self, url=None):        
 
         if url == None:
             url = self.url
@@ -116,13 +141,32 @@ class TeaserParser(URLObject):
 
         summaries=SummarizeUrl(url.encode('utf-8'))
 
-        resumen = ''
-        for s in summaries:
-            resumen += s
+        resumen = u''
+        if not(summaries is None):
+            for s in summaries:
+                print s
+                resumen += fix_text(s.decode('utf-8'))
 
-        a = dotdict({'url':url,'excerpt':resumen})
+        self.descriptor.update({'summary':resumen})
 
-        return a
+        return self.descriptor
+
+class PDFParser(URLObject):
+
+    def describe(self, url=None):        
+
+        if url == None:
+            url = self.url
+
+        if url == None:    
+            print "No URL provided"
+            return
+
+        texto = extract_pdf(url)
+        
+        self.descriptor.update({'fulltext':texto})
+
+        return self.descriptor
 
 #response=getAtrib(response)
 #data=[]

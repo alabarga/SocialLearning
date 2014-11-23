@@ -15,8 +15,8 @@ import json
 import re
 from urlunshort import resolve
 from django.core.management import call_command
-
-
+from learningobjects.utils import mod_delicious as deli
+from lxml import etree
 
 class SocialNetworkAPI(object):
 
@@ -36,6 +36,8 @@ class SocialNetworkAPI(object):
             print i
         return furl
 
+def extract_hash_tags(s):
+    return set(part[1:] for part in s.split() if part.startswith('#'))
 
 class Twitter(SocialNetworkAPI):
 
@@ -46,16 +48,93 @@ class Twitter(SocialNetworkAPI):
         CONSUMER_SECRET = 'PlIpSrh6unKYZISSDieBIFAB3D9f6aSh4p4Dmcn8Q'
         OAUTH_TOKEN = '1015949947-0Akq5OBnEzTp7OwaIuvLNiKN6L52FNLVOW9yIyf'
         OAUTH_TOKEN_SECRET = 'SJz3nXcyGt2lIKhmPiFg5VlTdHLbrRSPRRgUZ552xfe1e'
+
         ####Twitter auth handler####
         auth = OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
         auth.set_access_token(OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
+
         self.api = tweepy.API(auth)
 
         super(Twitter, self).__init__("twitter")
 
-    def find_mentions(self,url):
-        res = API.search(q=url)
+    def get_followers_count(self, user):
+        res=self.api.get_user(user).followers_count
+        return res
 
+    def get_post_count(self, user):
+        res=self.api.get_user(user).statuses_count
+        return res
+
+    def get_post_by_user_for_tag(self, tag):
+        a=self.api.search(q=tag, show_user=True)
+        users={}
+        for r in a:
+            if r.user.screen_name not in users:
+                users[r.user.screen_name]=1
+            else:
+                users[r.user.screen_name]+=1
+        return users
+
+    def find_mentions(self, url):
+        
+        # url = 'http://opensource.com/business/14/5/10-steps-migrate-closed-to-open-source'
+        # tt = Topsy().search('from:alabarga ' + url,window='d300').list
+
+        mentions = []
+        tt = Topsy().trackbacks(url).list
+
+        for t in tt:
+            status_url = t['permalink_url']            
+            m = re.search('(\d+)$',status_url)
+            status_id = m.group(0)
+
+            mention = {
+             'url': status_url,
+             'username': t['author']['name'],
+             'text': t['content'],
+             'count': 0,
+             'tags': extract_hash_tags(t['content'])
+            }
+            mentions.append(mention)
+
+        """
+        results = self.api.search(q=url)
+        for res in results:
+            mention = {
+             'url': "https://twitter.com/%s/status/%s" % (res.author.screen_name, res.id),
+             'username': res.author.screen_name,
+             'text': res.text,
+             'count':res.retweet_count,
+             'tags':res.entities['hashtags']
+            }
+            mentions.append(mention)
+        """
+
+        return mentions
+
+        # https://twitter.com/DanMAbraham/status/534125383524696065
+        #res[0].id
+        #res[0].text
+        #res[0].retweet_count
+        #res[0].author.screen_name
+        #res[0].author.followers_count
+        #res[0].author.statuses_count
+
+    def suggest_tags(self, url):
+        #https://alabarga:tour98@api.del.icio.us/v1/posts/suggest?url=http%3A%2F%2Fyahoo.com
+        #hontza/h0ntza14
+        url = 'https://hontza:h0ntza14@api.del.icio.us/v1/posts/suggest?url=http%3A%2F%2Fyahoo.com'
+        r = requests.get(url)
+
+        parser = etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8') 
+        xml = r.text.encode('utf-8')
+
+        h = etree.fromstring(xml, parser=parser)
+
+        tags = [ e.get('tag') for e in h.findall('popular')]
+
+        return tags
+        
     def get_expand(url,user,tag,):
         tagl=[]
         tagl.append(str(tag))
@@ -109,47 +188,59 @@ class Twitter(SocialNetworkAPI):
 class Delicious(SocialNetworkAPI):
 
     def __init__(self):
-        
-        self.base_url = 'https://avosapi.delicious.com/api/v1/posts/'
+
+        username = 'hontza'
+        password = 'h0ntza14'
+        clientId = 'ff0d2d6d04af32ec405708f3e50addab'
+        secret = '67488713f5bf3512388d58b59d6e9c3e'        
+
         super(Delicious, self).__init__("delicious")
 
     def auth(self):
 
-        clientId = '4269302d99c97fd93d143d78bd7c4592'
-        code = 'b4d2325534966ff16094e19d5b23146a'
         # https://avosapi.delicious.com/api/v1/oauth/token?client_id=f5dad5a834775d3811cdcfd6a37af312&client_secret=7363879fee6c3ab0f93efbd24111ad34&grant_type=code&code=fa746b2eb266cab06f34fb7bc3d51160
-
+        token = deli.getDeliciousToken(username,password,clientId,secret)        
 
         return token
 
-    def get_md5(self,url):
+    def get_md5(self, url):
 
-        api_url = '%s%s?url=' % (self.base_url,'compose',urllib.urlencode(url))
-
-        response=urllib2.urlopen(api_url)        
-        result =json.loads(response.read())
+        result = deli.apiRequestDelicious(token, "posts/compose", {'url': url})
 
         md5 = result['pkg']['md5']
 
-        # https://avosapi.delicious.com/api/v1/oauth/token?client_id=f5dad5a834775d3811cdcfd6a37af312&client_secret=7363879fee6c3ab0f93efbd24111ad34&grant_type=code&code=fa746b2eb266cab06f34fb7bc3d51160
-
-
         return md5
 
-    def find_mentions(self,url):
+    def find_mentions(self, url):
 
-        api_url = '%s%s%s' % (self.base_url,'comments/time/',self.get_md5(url))
+        result = deli.apiRequestDelicious(token,'posts/comments/time/'+self.get_md5(url))
 
-        response=urllib2.urlopen(api_url)        
-        result =json.loads(response.read())
-       
+        #'{"pkg":[{"id":"9873472","username":"michaelagates","avatar_url":"//delicious-icons.s3.amazonaws.com/default-avatar-2.jpg","full_name":"michaelagates","tags":["innovation","!fromtwitter"],"note":"10 things which seem unbelievable but could be 3D printed in the future! #innovation http://t.co/CxjNPBrFNQ","time_created":1375131011,"user_name":"michaelagates","user_id":"9873472"}],"status":"success","url":"http://avosapi.delicious.com/api/v1/posts/comments/time/03e8a7f48ebbf205ff361d9547faddde","delta_ms":15,"server":"api5-del","session":"cajvaelmblagumeezvk44lqu","api_mgmt_ms":0,"version":"v1"}'
+
+        mentions = []
+
+        for t in result['pkg']:
+            status_url = ''
+
+            mention = {
+             'url': status_url,
+             'username': t['username'],
+             'text': t['note'],
+             'count': 0,
+             'tags': t['tags']
+            }
+            mentions.append(mention)
+
+        return mentions
         
 
     def get_expand(url,user,tag,social_network):
         tagl=[]
         tagl.append(str(tag))
         relatedToTweet=[]        
-       
+        # https://avosapi.delicious.com/api/v1/posts/public/alabarga/time?tag=hontza
+        # http://feeds.delicious.com/v2/json/tag/3dprinting
+        # http://feeds.delicious.com/v2/json/alabarga/hontza
         print"----------------------------"  
         print "En delicious para el usuario "+user+" y tag "+str(tag)+": "
         url_to_call="http://feeds.delicious.com/v2/json/"+str(user)+"/"+urllib2.quote(str(tag),'') 

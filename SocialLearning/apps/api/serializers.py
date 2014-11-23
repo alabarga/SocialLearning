@@ -26,7 +26,7 @@ class ResourceSerializer(serializers.HyperlinkedModelSerializer):
                                                     view_name='relevance-detail')
 
     def get_interest(self, obj):
-        return obj.get_interest()
+        return obj.interest
 
     class Meta:
         model = Resource
@@ -41,8 +41,8 @@ class ResourceIdSerializer(serializers.HyperlinkedModelSerializer):
 
 class RelevanceSerializer(serializers.HyperlinkedModelSerializer):
 
-    topic = serializers.RelatedField()
-    resource = ResourceIdSerializer()
+    topic = serializers.HyperlinkedRelatedField(view_name='topic-detail')    #serializers.RelatedField() 
+    resource = serializers.HyperlinkedRelatedField(view_name='resource-detail') #ResourceIdSerializer()
 
     class Meta:
         model = Relevance
@@ -73,7 +73,7 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
 
 class MentionSerializer(serializers.HyperlinkedModelSerializer):
 
-    profile = serializers.RelatedField()
+    profile = serializers.HyperlinkedRelatedField(view_name='socialprofile-detail') #serializers.RelatedField()
     resource = serializers.HyperlinkedRelatedField(view_name='resource-detail')
 
     class Meta:
