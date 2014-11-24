@@ -101,7 +101,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     interest = serializers.SerializerMethodField('get_interest')
 
-    topic_list = serializers.SerializerMethodField('get_topics', read_only=True)
+    topic_list = serializers.SerializerMethodField('get_topics')
 
     mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                        view_name='mention-detail')
@@ -109,7 +109,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
     #topics = serializers.HyperlinkedRelatedField(many=True, read_only=True,
     #                                                 view_name='relevance-detail')
 
-    topics = TopicRelevanceSerializer(many=True)
+    topics = TopicRelevanceSerializer(many=True, read_only=True)
 
     # resource = serializers.CharField(source='get_absolute_url', read_only=True)
 
