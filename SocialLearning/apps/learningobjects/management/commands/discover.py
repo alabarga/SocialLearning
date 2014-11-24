@@ -11,6 +11,9 @@ from tweepy.streaming import StreamListener
 import urllib2
 import hashlib
 import json
+import time
+
+from learningobjects.utils.social import *
 
 #####TWITTER KEYS#####
 CONSUMER_KEY = 'ieZUZgZrSJJE0QLBBOsgXg'
@@ -22,9 +25,16 @@ auth = OAuthHandler(CONSUMER_KEY,CONSUMER_SECRET)
 auth.set_access_token(OAUTH_TOKEN,OAUTH_TOKEN_SECRET)
 twittApi = tweepy.API(auth)
 
+class dotdict(dict):
+    """dot.notation access to dictionary attributes"""
+    def __getattr__(self, attr):
+        return self.get(attr)
+    __setattr__= dict.__setitem__
+    __delattr__= dict.__delitem__
+
+
 class Command(BaseCommand):
-    args = 'query'
-    help = 'Expandir el numero de documentos'
+    help = 'Buscar menciones'
 
     option_list = BaseCommand.option_list + (
         make_option('-u','--url',
@@ -34,20 +44,36 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         results=[]
+        tw = Delicious()
+        sn, created = SocialNetwork.objects.get_or_create(name="delicious")
+
         if options['URL'] == None:   
             inp=raw_input("This will discover EVERY Resource with ´Described´ status on the database. Are you sure(y/n)?:")
             inp=inp.lower()
             if inp=="y" or inp=="yes":
                 resources=Resource.objects.filter(status=Resource.DESCRIBED)
                 for resource in resources:
-                    url=resource.url
-                    resource.status=Resource.DISCOVERED
-                    author, tags=getMentions(url,resource)
-                    for tag in tags:
-                        resource.tags.add(tag)
-                    #print resource.tags.all()
+                    #try:
+                    url=resource.url   
+                    print url                 
+                    mentions = tw.find_mentions(url)
+
+                    for m in mentions:
+                        sp, created = SocialProfile.objects.get_or_create(username=m.username, social_network=sn, url=sn.url+m.username)
+                        mm, created = Mention.objects.get_or_create(resource=resource, profile=sp)
+                        if created:
+                            mm.card = m.text
+                            for tag in m.tags:
+                                resource.tags.add(tag)
+                                mm.tags.add(tag)
+                            mm.save()
+                        print mm
+
+                    resource.status=Resource.DISCOVERED                   
                     resource.save()
-                    #print "Updated.."
+                    time.sleep(3)
+                    #except:
+                    #    continue
         else:
             url=options['URL']
             try:
@@ -60,8 +86,6 @@ class Command(BaseCommand):
             #print resource.tags.all()
             resource.status=Resource.DISCOVERED
             resource.save()
-
-            
             
 def getMentions(url,resource):
     furl=url

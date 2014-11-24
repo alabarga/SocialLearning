@@ -17,6 +17,14 @@ from urlunshort import resolve
 from django.core.management import call_command
 from learningobjects.utils import mod_delicious as deli
 from lxml import etree
+from learningobjects.utils.toppsyy import Topsy
+
+class dotdict(dict):
+    """dot.notation access to dictionary attributes"""
+    def __getattr__(self, attr):
+        return self.get(attr)
+    __setattr__= dict.__setitem__
+    __delattr__= dict.__delitem__
 
 class SocialNetworkAPI(object):
 
@@ -95,7 +103,7 @@ class Twitter(SocialNetworkAPI):
              'count': 0,
              'tags': extract_hash_tags(t['content'])
             }
-            mentions.append(mention)
+            mentions.append(dotdict(mention))
 
         """
         results = self.api.search(q=url)
@@ -163,7 +171,7 @@ class Twitter(SocialNetworkAPI):
                             rc=ResourceContainer.objects.get_or_create(rss=feed,url=link)
                             add_feed(feed)
         print "__________________________"
-            print ""
+        print ""
       
 
 # code: b4d2325534966ff16094e19d5b23146a
@@ -194,42 +202,43 @@ class Delicious(SocialNetworkAPI):
         clientId = 'ff0d2d6d04af32ec405708f3e50addab'
         secret = '67488713f5bf3512388d58b59d6e9c3e'        
 
+        self.token = deli.getDeliciousToken(username,password,clientId,secret)
         super(Delicious, self).__init__("delicious")
 
     def auth(self):
 
         # https://avosapi.delicious.com/api/v1/oauth/token?client_id=f5dad5a834775d3811cdcfd6a37af312&client_secret=7363879fee6c3ab0f93efbd24111ad34&grant_type=code&code=fa746b2eb266cab06f34fb7bc3d51160
-        token = deli.getDeliciousToken(username,password,clientId,secret)        
+        token = deli.getDeliciousToken(self.username,self.password,self.clientId,self.secret)        
 
         return token
 
     def get_md5(self, url):
 
-        result = deli.apiRequestDelicious(token, "posts/compose", {'url': url})
-
+        result = deli.apiRequestDelicious(self.token, "posts/compose", {'url': url})
+        result = json.loads(result)
         md5 = result['pkg']['md5']
-
+        
         return md5
 
     def find_mentions(self, url):
 
-        result = deli.apiRequestDelicious(token,'posts/comments/time/'+self.get_md5(url))
-
+        result = deli.apiRequestDelicious(self.token,'posts/comments/time/'+self.get_md5(url))
+        result = json.loads(result)
         #'{"pkg":[{"id":"9873472","username":"michaelagates","avatar_url":"//delicious-icons.s3.amazonaws.com/default-avatar-2.jpg","full_name":"michaelagates","tags":["innovation","!fromtwitter"],"note":"10 things which seem unbelievable but could be 3D printed in the future! #innovation http://t.co/CxjNPBrFNQ","time_created":1375131011,"user_name":"michaelagates","user_id":"9873472"}],"status":"success","url":"http://avosapi.delicious.com/api/v1/posts/comments/time/03e8a7f48ebbf205ff361d9547faddde","delta_ms":15,"server":"api5-del","session":"cajvaelmblagumeezvk44lqu","api_mgmt_ms":0,"version":"v1"}'
 
         mentions = []
+        if result['pkg']:
+            for t in result['pkg']:
+                status_url = ''
 
-        for t in result['pkg']:
-            status_url = ''
-
-            mention = {
-             'url': status_url,
-             'username': t['username'],
-             'text': t['note'],
-             'count': 0,
-             'tags': t['tags']
-            }
-            mentions.append(mention)
+                mention = {
+                 'url': status_url,
+                 'username': t['username'],
+                 'text': t['note'],
+                 'count': 0,
+                 'tags': t['tags']
+                }
+                mentions.append(dotdict(mention))
 
         return mentions
         
