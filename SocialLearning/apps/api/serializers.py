@@ -136,6 +136,12 @@ class ResourceIdSerializer(serializers.HyperlinkedModelSerializer):
         model = Resource
         fields = ('id', 'title')
 
+class ResourceContainerSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = ResourceContainer
+        fields = ('name', 'url','rss')
+
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
