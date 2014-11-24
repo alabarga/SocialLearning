@@ -1047,7 +1047,7 @@ class Pafy(object):
             for s in self.allstreams:
                 # pylint: disable=W0104
                 s.get_filesize()
-
+    
     def fetch_basic(self):
         """ Fetch basic data and streams. """
         if self._have_basic:

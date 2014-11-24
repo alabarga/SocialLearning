@@ -7,8 +7,9 @@ from pyteaser import SummarizeUrl
 import requests
 
 from learningobjects.utils.pdf import extract_pdf
-
-
+from learningobjects.utils import youtube
+import unfurl
+from urlunshort import resolve
 
 ###Readability parser
 
@@ -21,6 +22,16 @@ class dotdict(dict):
 
 
 class URLObject(object):
+
+    def clean(url):
+        furl=url
+        i=0
+        while resolve(url)!=None and i<5:
+            furl=url
+            url=resolve(url)
+            i+=1
+            print i
+        return furl
 
     @property
     def available_fields():
@@ -37,8 +48,8 @@ class URLObject(object):
 
     def __init__(self, url=None):
         if url != None:
-            self.url = url
-            self.descriptor = dotdict({'url':url})
+            self.url = self.clean(url)
+            self.descriptor = dotdict({'url':self.url})
 
 class ReadibilityParser(URLObject):
 
@@ -165,6 +176,24 @@ class PDFParser(URLObject):
         texto = extract_pdf(url)
         
         self.descriptor.update({'fulltext':texto})
+
+        return self.descriptor
+
+
+class YoutubeParser(URLObject):
+
+    def describe(self, url=None):        
+
+        if url == None:
+            url = self.url
+
+        if url == None:    
+            print "No URL provided"
+            return
+
+        video = youtube.new(url)
+        
+        self.descriptor.update(video)
 
         return self.descriptor
 
