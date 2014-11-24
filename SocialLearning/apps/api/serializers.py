@@ -101,7 +101,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     interest = serializers.SerializerMethodField('get_interest')
 
-    topic_list = serializers.SerializerMethodField('get_topics')
+    topic_list = serializers.SerializerMethodField('get_topics', read_only=True)
 
     mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
                                                        view_name='mention-detail')
@@ -159,7 +159,7 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     social_network = serializers.RelatedField()
     class Meta:
         model = SocialProfile
-        fields = ('social_network', 'username',)
+        fields = ('url','social_network', 'username',)
 
 class MentionSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -172,7 +172,7 @@ class MentionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Mention
-        fields = ('profile','resource', 'mention','card')          
+        fields = ('url','profile','resource', 'mention','card')          
 
 
 
