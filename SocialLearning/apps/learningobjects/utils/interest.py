@@ -5,6 +5,10 @@ import tweepy
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+from learningobjects.utils.parsers import *
+
+from learningobjects.utils.unfurl import expand_url
+from urlunshort import resolve
 
 #####TWITTER KEYS#####
 CONSUMER_KEY = 'ieZUZgZrSJJE0QLBBOsgXg'
@@ -43,36 +47,37 @@ def dictsum(d):
 
 class Interest(object):
 
-    def __init__(self):
-        
+    def clean(self, url):
+
+        try:
+            furl = expand_url(url)
+        except:
+            furl = url
+
+        return furl
+
+    def __init__(self, url):
+
+        self.url = self.clean(url)
+
         self.factores = {'LinkedIn': 2, 'Twitter': 2, 'Delicious':2 } 
         self.suma = sum(self.factores.values())
         for key in self.factores.keys():
             self.factores[key] = self.factores[key] / self.suma        
 
-    def get_interest_count(self,url):
-        response=urllib2.urlopen('http://free.sharedcount.com/?url='+url+'&apikey=cabec5c5d636b063cbbcf8cbe966fd3c4c7d9152')
+    def get_interest_count(self):
+
+        response=urllib2.urlopen('http://free.sharedcount.com/?url='+self.url+'&apikey=cabec5c5d636b063cbbcf8cbe966fd3c4c7d9152')
         res=json.loads(response.read())
         return res
 
-    def get_interest(self, url):
+    def get_interest(self):
 
-        data = self.get_interest_count(url)
+        res = self.get_interest_count()
 
-        url_interest = dictsum(data)
+        url_interest = res['Twitter'] + res['Facebook']['total_count']
        
         #for key in self.factores.keys():
         #    url_interest += data[key] * self.factores[key] / suma
 
         return url_interest 
-
-    def get_count(self,url,social_network):
-        print "hola"
-        data=self.get_interest_count(url)
-        to_pop=[]
-        for sn in data:
-            if sn not in social_network:
-                to_pop.append(sn)
-        for tp in to_pop:
-            data.pop(tp)
-        return data

@@ -23,7 +23,7 @@ class dotdict(dict):
 
 class URLObject(object):
 
-    def clean(url):
+    def clean2(self, url):
         furl=url
         i=0
         while resolve(url)!=None and i<5:
@@ -33,6 +33,15 @@ class URLObject(object):
             print i
         return furl
 
+    def clean(self, url):
+
+        try:
+            furl = expand_url(url)
+        except:
+            furl = url
+
+        return furl
+        
     @property
     def available_fields():
         return self.descriptor.viewkeys()
