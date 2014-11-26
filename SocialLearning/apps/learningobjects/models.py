@@ -2,7 +2,7 @@ from django.db import models
 from taggit.managers import TaggableManager
 from redactor.fields import RedactorField
 import random 
-
+import hashlib
 # Create your models here.
 
 class SocialNetwork(models.Model):
@@ -59,7 +59,7 @@ class Resource(models.Model):
         (EXPANDED, 'Expanded'),
     )
 
-    identifier = models.CharField(max_length=40, null=True, blank=True)
+    identifier = models.CharField(max_length=40, null=True, blank=True, unique=True)
     title = models.CharField(max_length=255)
     url = models.URLField()
     container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
@@ -95,7 +95,8 @@ class Resource(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        #self.identifier = "" # sha1
+        if self.pk is None:
+            self.identifier = hashlib.md5(self.url).hexdigest() # sha1
         super(Resource, self).save(*args, **kwargs)
 
     @property
