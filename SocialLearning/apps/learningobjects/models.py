@@ -59,7 +59,7 @@ class Resource(models.Model):
         (EXPANDED, 'Expanded'),
     )
 
-    identifier = models.CharField(max_length=20, null=True, blank=True)
+    identifier = models.CharField(max_length=30, null=True, blank=True)
     title = models.CharField(max_length=255)
     url = models.URLField()
     container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
