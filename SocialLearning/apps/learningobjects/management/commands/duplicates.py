@@ -56,12 +56,12 @@ class Command(BaseCommand):
         for res in resources:
             url = res.url
             identifier = hashlib.md5(url).hexdigest()
-            print "%s: %s" % (identifier, res.url)
+            #print "%s: %s" % (identifier, res.url)
             if ids.has_key(identifier):
                 print "Duplicated %s: %s" % (identifier, res.url)
                 res.delete()
             else:
-                #print "%s: %s" % (identifier, res.url)
+                print "%s: %s" % (identifier, res.url)
                 ids[identifier] = 1
                 res.identifier = identifier
                 res.save()                
