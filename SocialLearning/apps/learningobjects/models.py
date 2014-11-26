@@ -95,7 +95,7 @@ class Resource(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.identifier = "" # sha1
+        #self.identifier = "" # sha1
         super(Resource, self).save(*args, **kwargs)
 
     @property
