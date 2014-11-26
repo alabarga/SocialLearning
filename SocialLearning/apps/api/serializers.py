@@ -178,7 +178,8 @@ class MentionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Mention
-        fields = ('url','profile','resource', 'mention','card')          
+        url_field_name = 'mention_url'
+        fields = ('mention_url', 'profile','resource', 'mention','card')          
 
 
 
