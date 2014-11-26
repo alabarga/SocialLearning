@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        #resources=Resource.objects.all().update(identifier='')
+        resources=Resource.objects.all().update(identifier='')
 
         ids = dict()
         resources=Resource.objects.all()
@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 print "%s: %s" % (identifier, res.url)
                 if ids.has_key(identifier):
                     print "Duplicated %s: %s" % (identifier, res.url)
-                    # res.delete()
+                    res.delete()
                 else:
                     print "%s: %s" % (identifier, res.url)
                     ids[identifier] = 1
