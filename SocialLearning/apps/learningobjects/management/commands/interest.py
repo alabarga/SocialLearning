@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
         resources=Resource.objects.filter(status=Resource.ADDED)
         for res in resources:
-
+            print res.url
             try:
                 i = Interest(res.url)
                 interes = i.get_interest()
