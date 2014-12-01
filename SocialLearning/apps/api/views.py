@@ -7,6 +7,18 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import viewsets
 
+class ResourceSearch(APIView):
+    """
+    List all snippets, or create a new snippet.
+    """
+    def get(self, request, format=None):
+
+        interest = request.GET.get('interest', None)
+
+        resources = Resource.objects.filter(_interest__gte=interest)
+        serializer = ResourceDetailSerializer(resources, many=True, context={'request': request})
+        return Response(serializer.data)
+
 class ResourceViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.

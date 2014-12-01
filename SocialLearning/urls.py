@@ -54,7 +54,9 @@ router.register(r'profiles', views.ProfileViewSet)
 router.register(r'topics', views.TopicViewSet)
 router.register(r'relevance', views.RelevanceViewSet)
 router.register(r'feeds', views.ResourceContainerViewSet)
+router.register(r'noticias', views.ResourceSearch, base_name='noticias')
 
 urlpatterns += patterns('',
+    url(r'noticias/', views.ResourceSearch.as_view()),
     url(r'api/', include(router.urls)),
 )

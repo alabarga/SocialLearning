@@ -2,7 +2,6 @@ from django.forms import widgets
 from rest_framework import serializers
 from learningobjects.models import *
 
-
 class TagListSerializer(serializers.WritableField):
 
     def from_native(self, data):
@@ -27,19 +26,33 @@ class RelevanceSerializer(serializers.HyperlinkedModelSerializer):
 class ResourceRelevanceSerializer(serializers.HyperlinkedModelSerializer):
  
     resource = serializers.HyperlinkedRelatedField(view_name='resource-detail') #ResourceIdSerializer()
+    name = serializers.SerializerMethodField('get_name')
+
+    def get_name(self, obj):
+        return obj.topic.name
 
     class Meta:
         model = Relevance
-        fields = ('resource', 'score')  
+        fields = ('resource', 'name', 'score')  
 
 class TopicRelevanceSerializer(serializers.HyperlinkedModelSerializer):
 
     topic = serializers.HyperlinkedRelatedField(view_name='topic-detail')    #serializers.RelatedField() 
     resource = serializers.HyperlinkedRelatedField(view_name='resource-detail') #ResourceIdSerializer()
 
+    name = serializers.SerializerMethodField('get_name')
+
+    def get_name(self, obj):
+        return obj.topic.name
+
+    tags = serializers.SerializerMethodField('get_tags')
+
+    def get_tags(self, obj):
+        return [tag.name for tag in obj.topic.tags.all()] 
+
     class Meta:
         model = Relevance
-        fields = ('topic', 'score')  
+        fields = ('topic', 'name', 'tags', 'score')  
 
 class ResourceSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -79,6 +92,69 @@ class ResourceListSerializer(serializers.HyperlinkedModelSerializer):
     #topics = serializers.HyperlinkedRelatedField(many=True, read_only=True,
     #                                                view_name='relevance-detail')
 
+    topics = TopicRelevanceSerializer(many=True, read_only=True)
+    # resource = serializers.CharField(source='get_absolute_url', read_only=True)
+
+    mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                       view_name='mention-detail')
+    #resource = serializers.HyperlinkedIdentityField(
+    #    view_name='resource_detail',
+    #    lookup_field='identifier'
+    #)
+
+    def get_interest(self, obj):
+        return obj.interest
+
+    def get_topics(self, obj):
+        return obj.topic_list
+
+    class Meta:
+        model = Resource
+        url_field_name = 'resource'
+        fields = ('resource', 'url', 'title', 'description', 'interest', 'topic_list', 'topics','mentions')
+
+class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
+
+    interest = serializers.SerializerMethodField('get_interest')
+
+    topic_list = serializers.SerializerMethodField('get_topics')
+
+    mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+                                                       view_name='mention-detail')
+
+    #collection = serializers.HyperlinkedRelatedField(view_name='collection-detail')
+    #topics = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+    #                                                 view_name='relevance-detail')
+
+    topics = TopicRelevanceSerializer(many=True, read_only=True)
+
+    tags = TagListSerializer(blank=True)
+
+    # resource = serializers.CharField(source='get_absolute_url', read_only=True)
+
+    #resource = serializers.HyperlinkedIdentityField(
+    #    view_name='resource_detail',
+    #    lookup_field='identifier'
+    #)
+
+    def get_interest(self, obj):
+        return obj.interest
+
+    def get_topics(self, obj):
+        return obj.topic_list
+
+
+    class Meta:
+        model = Resource
+        url_field_name = 'resource'
+        fields = ('resource', 'url', 'title', 'description', 'tags', 'interest', 'topic_list', 'topics', 'mentions')
+
+class ResourceMongoSerializer(serializers.ModelSerializer):
+
+    interest = serializers.SerializerMethodField('get_interest')
+
+    topic_list = serializers.SerializerMethodField('get_topics')
+
     # resource = serializers.CharField(source='get_absolute_url', read_only=True)
 
     #resource = serializers.HyperlinkedIdentityField(
@@ -97,38 +173,13 @@ class ResourceListSerializer(serializers.HyperlinkedModelSerializer):
         url_field_name = 'resource'
         fields = ('resource', 'url', 'title', 'description', 'interest', 'topic_list')
 
-class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
 
-    interest = serializers.SerializerMethodField('get_interest')
-
-    topic_list = serializers.SerializerMethodField('get_topics')
-
-    mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
-                                                       view_name='mention-detail')
-
-    #topics = serializers.HyperlinkedRelatedField(many=True, read_only=True,
-    #                                                 view_name='relevance-detail')
-
-    topics = TopicRelevanceSerializer(many=True, read_only=True)
-
-    # resource = serializers.CharField(source='get_absolute_url', read_only=True)
-
-    #resource = serializers.HyperlinkedIdentityField(
-    #    view_name='resource_detail',
-    #    lookup_field='identifier'
-    #)
-
-    def get_interest(self, obj):
-        return obj.interest
-
-    def get_topics(self, obj):
-        return obj.topic_list
+class ResourceURLSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Resource
         url_field_name = 'resource'
-        fields = ('resource', 'url', 'title', 'description', 'interest', 'topic_list', 'topics', 'mentions')
-
+        fields = ('resource', 'title', 'url')
 
 class ResourceIdSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -151,14 +202,23 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Topic
         url_field_name = 'topic'
-        fields = ('topic', 'name', 'relevance')
+        fields = ('topic', 'name', 'tags', 'relevance')
 
+"""
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 
     resources = serializers.HyperlinkedIdentityField(view_name='resource-detail')
     class Meta:
         model = Collection
         fields = ('name','resources')        
+"""
+
+class CollectionSerializer(serializers.HyperlinkedModelSerializer):
+    
+    resources = ResourceDetailSerializer(many=True, read_only=True)
+    class Meta:
+        model = Collection
+        fields = ('url', 'name', 'description', 'resources',)
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     

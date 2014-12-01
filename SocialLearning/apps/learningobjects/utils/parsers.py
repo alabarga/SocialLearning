@@ -188,6 +188,24 @@ class PDFParser(URLObject):
 
         return self.descriptor
 
+#https://gdata.youtube.com/feeds/api/videos/MLK-_4Vb8Iw/captions&access_token=AIzaSyDQjDxSwnFVVvUmaZPJMhOJd0bbTRVIU48
+#http://video.google.com/timedtext?lang=en&v=MLK-_4Vb8Iw
+#http://www.serpsite.com/transcript.php?videoid=https://www.youtube.com/watch?v=MLK-_4Vb8Iw
+#http://stackoverflow.com/questions/14061195/how-to-get-transcript-in-youtube-api-v3
+#https://gdata.youtube.com/feeds/api/videos/MLK-_4Vb8Iw/captions&access_token=AIzaSyDQjDxSwnFVVvUmaZPJMhOJd0bbTRVIU48
+#http://video.google.com/timedtext?lang=en&v=MLK-_4Vb8Iw
+#http://www.serpsite.com/transcript.php?videoid=https://www.youtube.com/watch?v=MLK-_4Vb8Iw
+#http://stackoverflow.com/questions/14013431/extract-automatic-captions-from-youtube-video
+#http://video.google.com/timedtext?hl=en&v=bgvrYAXjQHI&lang=en&type=text
+#https://www.youtube.com/api/timedtext?v=MLK-_4Vb8Iw&type=track&lang=en&name&kind=asr&fmt=1
+#v=MLK-_4Vb8Iw
+#&hl=es-ES
+#&signature=F08A79C29F199C9EF7E17BDA9DAC1D1000D7EE81.B0F3417880C31FFC7B4F8DDA50FE83CC79D8B9EA
+#&caps=asr
+#&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&key=yttt1
+#&expire=1417039177
+#&asr_langs=en%2Cde%2Cko%2Cja%2Cru%2Cfr%2Cnl%2Cpt%2Cit%2Ces
+#http://www.serpsite.com/transcript.php?videoid=https://www.youtube.com/watch?v=MLK-_4Vb8Iw
 
 class YoutubeParser(URLObject):
 
@@ -201,8 +219,8 @@ class YoutubeParser(URLObject):
             return
 
         video = youtube.new(url)
-        
-        self.descriptor.update(video)
+        video.url = url
+        self.descriptor = video
 
         return self.descriptor
 

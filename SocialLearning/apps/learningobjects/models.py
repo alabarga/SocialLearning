@@ -105,7 +105,8 @@ class Resource(models.Model):
 
 class Collection(models.Model):
     name = models.CharField(max_length=255)
-    resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collections")
+    description = RedactorField(null=True, blank=True)
+    resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
 
     def __unicode__(self):
         return self.name

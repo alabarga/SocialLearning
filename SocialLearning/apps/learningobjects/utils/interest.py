@@ -37,6 +37,16 @@ twittApi = tweepy.API(auth)
 #  u'Buzz': 0
 # }
 
+import math
+
+def sigmoid(x, x0, k):
+    y = 1 / (1+ math.exp(-k*(x-x0)))
+    return y
+
+def adjust(x):
+    y = 100 * sigmoid(x,85,0.06)
+    return y
+
 def dictsum(d):
     suma = 0
     for k, v in d.iteritems():

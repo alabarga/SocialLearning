@@ -33,3 +33,7 @@ node_modules/
 
 # migrations
 migrations/
+
+# local configuration
+SocialLearning/config/local.py
+SocialLearning/wsgi.py
