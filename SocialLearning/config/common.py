@@ -285,6 +285,7 @@ class Common(Configuration):
             #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
             'rest_framework.permissions.AllowAny',
         ]
+        'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
     }
 
     SWAGGER_SETTINGS = {
