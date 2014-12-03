@@ -2,7 +2,7 @@ from google_search import GoogleCustomSearch
 import sha
 import xml.etree.ElementTree as ET
 import unfurl
-import urllib2
+import urllib2, urllib
 import json
 import time
 from urlunshort import resolve
@@ -103,14 +103,15 @@ class Google(SearchEngine):
 class DuckDuckGoIO(SearchEngine):
 
     def __init__(self):
-        super(DuckDuckGoIO, self).__init__("duckduckgo")
+        super(DuckDuckGoIO, self).__init__("duckduckgo")            
 
     #Busca en duckduck con los parametros que se pasen
     def search(self,query):
         links=[]        
         IMPORT_IO_USER = "7d0326db-696a-436d-8aba-f6c2e1c9e921"
         IMPORTIO_API_KEY = "89Gl8Ce2tiqX949GcKQTE9hCg6NW%2FkN36WpGKEA4knjhoTTRT72%2BitSWPicKFsZ4RmTwvyMbC%2BOrPtxAvy1EGw%3D%3D"
-        url="https://api.import.io/store/data/97e350d1-d55c-4c66-bcc4-5c2bd2eb8765/_query?input/query="+query+"&_user="+IMPORT_IO_USER+"&_apikey="+IMPORTIO_API_KEY
+        url="https://api.import.io/store/data/97e350d1-d55c-4c66-bcc4-5c2bd2eb8765/_query?input/query="+urllib.quote(query)+"&_user="+IMPORT_IO_USER+"&_apikey="+IMPORTIO_API_KEY
+
         response=urllib2.urlopen(url)
         res=response.read()
         res=json.loads(res)
@@ -143,6 +144,7 @@ class Slideshare(SearchEngine):
             url="https://www.slideshare.net/api/2/get_slideshows_by_tag?tag="+tag+"&limit=10&api_key="+ssapi_key+"&hash="+time_hash+"&ts="+str(ts)
         else: 
             print "error"
+
         response=urllib2.urlopen(url)
         res=response.read()
         #print res

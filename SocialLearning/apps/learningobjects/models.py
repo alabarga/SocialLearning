@@ -85,7 +85,7 @@ class Resource(models.Model):
     relevant = models.ManyToManyField(Topic, null=True, blank=True, related_name='resources', through='Relevance')
     last_processed = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
     _interest = models.FloatField(default=0.0)
     fulltext = RedactorField(null=True, blank=True) 
 
@@ -124,7 +124,7 @@ class Collection(models.Model):
     name = models.CharField(max_length=255)
     description = RedactorField(null=True, blank=True)
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     def __unicode__(self):
         return self.name
@@ -133,7 +133,7 @@ class Mention(models.Model):
     profile = models.ForeignKey(SocialProfile,related_name="mentions",)
     resource = models.ForeignKey(Resource,related_name="mentions",)
     card = RedactorField(null=True, blank=True)
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     def __unicode__(self):
         return u"%s by %s" % (self.resource, self.profile)
