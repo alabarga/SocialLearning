@@ -147,7 +147,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Resource
         url_field_name = 'resource'
-        fields = ('resource', 'url', 'title', 'description', 'tags', 'interest', 'topic_list', 'topics', 'mentions')
+        fields = ('resource', 'collection','url', 'title', 'description', 'tags', 'interest', 'topic_list', 'topics', 'mentions')        
 
 class ResourceMongoSerializer(serializers.ModelSerializer):
 
@@ -216,6 +216,13 @@ class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
     
     resources = ResourceDetailSerializer(many=True, read_only=True)
+    class Meta:
+        model = Collection
+        fields = ('url', 'name', 'description', 'resources',)
+
+class CollectionUpdateSerializer(serializers.HyperlinkedModelSerializer):
+    
+    resources = serializers.PrimaryKeyRelatedField(many=True)
     class Meta:
         model = Collection
         fields = ('url', 'name', 'description', 'resources',)
