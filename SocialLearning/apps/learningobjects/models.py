@@ -1,9 +1,11 @@
+#-*- coding: UTF-8 -*-
+
 from django.db import models
 from taggit.managers import TaggableManager
 from redactor.fields import RedactorField
 import random 
 import hashlib
-# Create your models here.
+from suit_redactor.widgets import RedactorWidget
 
 class SocialNetwork(models.Model):
     name = models.CharField(max_length=255)
@@ -66,11 +68,17 @@ class Resource(models.Model):
         ('VIDEO', 'Video'),
     )
 
+    RESOURCES_LANG = (
+        ('es', u'Español'),
+        ('en', u'Inglés'),
+    )
+
     identifier = models.CharField(max_length=40, null=True, blank=True, unique=True)
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, null=True, blank=True)
+    language = models.CharField(max_length=255, null=True, blank=True)
     url = models.URLField()
-    domain = models.CharField(max_length=255)
-    content_type = models.CharField(max_length=10, default='WEB', choices=RESOURCES_TYPE )
+    domain = models.CharField(max_length=255,null=True, blank=True)
+    content = models.CharField(max_length=10, default='WEB', choices=RESOURCES_TYPE )
     container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
     description = RedactorField(null=True, blank=True)    
     seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
@@ -116,6 +124,7 @@ class Collection(models.Model):
     name = models.CharField(max_length=255)
     description = RedactorField(null=True, blank=True)
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
+    tags = TaggableManager()
 
     def __unicode__(self):
         return self.name

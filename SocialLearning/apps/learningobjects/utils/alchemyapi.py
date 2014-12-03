@@ -138,7 +138,11 @@ class AlchemyAPI:
         Initializes the SDK so it can send requests to AlchemyAPI for analysis.
         It loads the API key from api_key.txt and configures the endpoints.
         """
+        self.keys = ['87b55cf4eede714b206619a6852c845184498f5b','5d73bf41ec9cf658bdb5f519b3a95f3d013fd41b', 'e99b8bebafccd50a91730d633ab26aa105d67ee4']
+        self.key = 0
+        self.apikey = self.keys[self.key]
 
+        """
         import sys
         try:
             #Open the key file and read the key
@@ -175,6 +179,13 @@ class AlchemyAPI:
             sys.exit(0)
         except Exception as e:
             print(e)
+        """
+
+    def next_key(self):
+
+        self.key = (self.key + 1) % len(self.keys)
+        self.apikey = self.keys[self.key]
+
 
     def entities(self, flavor, data, options={}):
         """
@@ -745,11 +756,15 @@ class AlchemyAPI:
             post_url = AlchemyAPI.BASE_URL + endpoint + '?' + urlencode(params)
 
         results = ""
+
         try:
             results = self.s.post(url=post_url, data=post_data)
         except Exception as e:
             print(e)
             return {'status': 'ERROR', 'statusInfo': 'network-error'}
+
+        self.next_key()
+
         try:
             return results.json()
         except Exception as e:

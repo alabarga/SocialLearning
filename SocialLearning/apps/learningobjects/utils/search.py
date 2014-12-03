@@ -7,8 +7,6 @@ import json
 import time
 from urlunshort import resolve
 
-
-
 class SearchEngine(object):
 
     def __init__(self, engine):
@@ -25,6 +23,48 @@ class SearchEngine(object):
             print i
         return furl
 
+"""
+from GoogleScraper import scrape_with_config, GoogleSearchError
+from GoogleScraper.database import ScraperSearch, SERP, Link
+
+class GoogleScrape(SearchEngine):
+
+    def __init__(self):
+
+        super(GoogleScrape, self).__init__("GoogleScrape")
+
+    def search(self, query):
+
+        # See in the config.cfg file for possible values
+        config = {
+            'SCRAPING': {
+                'use_own_ip': 'True',
+                'keyword': query,
+                'search_engine': 'duckduckgo'
+            },
+            'SELENIUM': {
+                'sel_browser': 'chrome',
+            },
+            'GLOBAL': {
+                'do_caching': 'True'
+            }
+        }
+        try:
+            sqlalchemy_session = scrape_with_config(config)
+        except GoogleSearchError as e:
+            print(e)
+
+        # let's inspect what we got
+        links = []
+        for search in sqlalchemy_session.query(ScraperSearch).all():
+            for serp in search.serps:
+                print(serp)
+                for link in serp.links:
+                    links.append(link)
+                    print(link)
+
+        return links
+"""
 
 class Delicious(SearchEngine):
 

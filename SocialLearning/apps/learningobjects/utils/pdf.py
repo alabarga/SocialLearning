@@ -18,6 +18,54 @@ import requests
 from urllib2 import Request
 
 
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.converter import HTMLConverter
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfpage import PDFPage
+from cStringIO import StringIO
+import re
+import csv
+
+
+def convert_pdf_to_html(url):
+
+    r = requests.head(url)
+    r.headers["content-type"]
+
+    if 'application/pdf' in r.headers["content-type"]:
+
+        r = requests.get(url)
+
+        # Cast to StringIO object
+        from StringIO import StringIO
+        memory_file = StringIO(r.content)
+
+        # Create a PDF parser object associated with the StringIO object
+        parser = PDFParser(memory_file)
+
+        # Create a PDF document object that stores the document structure
+        document = PDFDocument(parser)
+
+        rsrcmgr = PDFResourceManager()
+        retstr = StringIO()
+        codec = 'utf-8'
+        laparams = LAParams()
+        device = HTMLConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        password = ""
+        maxpages = 0 #is for all
+        caching = True
+        pagenos=set()
+
+        for page in PDFPage.create_pages(document):
+            interpreter.process_page(page)
+
+        device.close()
+        str = retstr.getvalue()
+        retstr.close()
+        return str
 
 def extract_pdf(url):
 

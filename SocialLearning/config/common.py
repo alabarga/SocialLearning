@@ -39,6 +39,8 @@ class Common(Configuration):
 
         # Admin
         'suit',        
+        'redactor', 
+        'suit_redactor',
         'django.contrib.admin',
         'django_extensions',
     )
