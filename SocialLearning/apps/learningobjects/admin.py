@@ -4,7 +4,11 @@ from django.contrib import admin
 
 from learningobjects.models import *
 
-admin.site.register(Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    filter_horizontal = ("resources",)
+
+
+admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Resource)
 admin.site.register(ResourceContainer)
 admin.site.register(SocialNetwork)

@@ -59,9 +59,18 @@ class Resource(models.Model):
         (EXPANDED, 'Expanded'),
     )
 
+    RESOURCES_TYPE = (
+        ('WEB', 'Web page'),
+        ('BLOG', 'Blog post'),
+        ('PDF', 'PDF file'),
+        ('VIDEO', 'Video'),
+    )
+
     identifier = models.CharField(max_length=40, null=True, blank=True, unique=True)
     title = models.CharField(max_length=255)
     url = models.URLField()
+    domain = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=10, default='WEB', choices=RESOURCES_TYPE )
     container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
     description = RedactorField(null=True, blank=True)    
     seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')

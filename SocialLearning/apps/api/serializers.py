@@ -54,6 +54,16 @@ class TopicRelevanceSerializer(serializers.HyperlinkedModelSerializer):
         model = Relevance
         fields = ('topic', 'name', 'tags', 'score')  
 
+class MentionShortSerializer(serializers.HyperlinkedModelSerializer):
+
+    mention = serializers.SerializerMethodField('get_username')
+    def get_username(self, obj):
+        return obj.__unicode__
+
+    class Meta:
+        model = Mention
+        fields = ('mention','card')            
+        
 class ResourceSerializer(serializers.HyperlinkedModelSerializer):
 
     interest = serializers.SerializerMethodField('get_interest')
@@ -119,12 +129,15 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     topic_list = serializers.SerializerMethodField('get_topics')
 
-    mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
-                                                       view_name='mention-detail')
+    #mentions = serializers.HyperlinkedRelatedField(many=True, read_only=True,
+    #                                                   view_name='mention-detail')
 
     #collection = serializers.HyperlinkedRelatedField(view_name='collection-detail')
     #topics = serializers.HyperlinkedRelatedField(many=True, read_only=True,
     #                                                 view_name='relevance-detail')
+
+
+    mentions = MentionShortSerializer(many=True, read_only=True)
 
     topics = TopicRelevanceSerializer(many=True, read_only=True)
 
@@ -246,7 +259,9 @@ class MentionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Mention
         url_field_name = 'mention_url'
-        fields = ('mention_url', 'profile','resource', 'mention','card')          
+        fields = ('mention_url', 'profile','resource', 'mention','card')         
+
+
 
 
 

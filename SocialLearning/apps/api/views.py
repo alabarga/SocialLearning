@@ -12,9 +12,11 @@ import django_filters
 class ResourceFilter(django_filters.FilterSet):
     interest = django_filters.NumberFilter(name="_interest", lookup_type='gte')
     title = django_filters.CharFilter(name="title", lookup_type='icontains')
+    socialnetwork = django_filters.CharFilter(name="seen_at__social", lookup_type='icontains')
+    username = django_filters.CharFilter(name="seen_at__username", lookup_type='icontains')
     class Meta:
         model = Resource
-        fields = ['interest', 'title']
+        fields = ['interest', 'title', 'socialnetwork', 'username']
 
 class ResourceSearch(APIView):
     """
@@ -42,7 +44,7 @@ class DualSerializerViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'list':
-            return ResourceListSerializer
+            return ResourceDetailSerializer
         if self.action == 'retrieve':
             return ResourceDetailSerializer
         return ResourceDetailSerializer # I dont' know what you want for create/destroy/update       
