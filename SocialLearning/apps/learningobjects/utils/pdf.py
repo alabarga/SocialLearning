@@ -100,8 +100,13 @@ def extract_pdf(url):
 
         # Process each page contained in the document
         texto = ''
+        page_no = 1
         for page in PDFPage.create_pages(document):
             interpreter.process_page(page)
             texto +=  retstr.getvalue()
+            page_no += 1
+
+            if page_no > 5:
+                break
 
     return texto            

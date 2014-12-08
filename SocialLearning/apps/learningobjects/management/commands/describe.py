@@ -103,8 +103,8 @@ class Command(BaseCommand):
                             res.title = rp_desc.title
                             res.description = rp_desc.cleaned_text
                             res.fulltext = gp_desc.fulltext
-                            np = TextBlob(“I have good spelling!”)
-                            np.detect_language()
+                            np = TextBlob(rp_desc.cleaned_text)
+                            res.language = np.detect_language()
                             res.author = rp_desc.author
                             res.content_type = 'WEB'
 
