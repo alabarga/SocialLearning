@@ -13,7 +13,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
 class ResourceAdmin(admin.ModelAdmin):
     list_display = ("identifier","title")
-    list_filter = ("status")
+    list_filter = ("status",)
     search_fields = ("identifier","title","description")
 
 admin.site.register(Collection, CollectionAdmin)
