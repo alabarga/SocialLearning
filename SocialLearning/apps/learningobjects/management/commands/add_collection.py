@@ -21,6 +21,7 @@ class Command(BaseCommand):
 
             enlaces_iniciales = set()
             texto = ''
+            tags = set()
             
             for resource in collection.resources.all():
                 url = resource.url
