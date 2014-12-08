@@ -1,5 +1,6 @@
 #-*- coding: UTF-8 -*-
 from learningobjects.utils.search import *
+from learningobjects.utils.parsers import *
 from django.core.management.base import BaseCommand, CommandError
 from learningobjects.models import *
 from optparse import make_option
