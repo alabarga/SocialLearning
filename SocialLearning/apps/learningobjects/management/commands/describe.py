@@ -14,6 +14,7 @@ from learningobjects.utils import slideshare
 from textblob import TextBlob
 # pip install -U textblob
 # python -m textblob.download_corpora
+import sys, traceback
 
 class Command(BaseCommand):
  
