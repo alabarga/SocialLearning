@@ -64,6 +64,7 @@ class Command(BaseCommand):
 
                     try:
                         url = res.url
+                        print url
                         res.identifier = hashlib.md5(url).hexdigest()
                         if options['log']: print url
                         u = URLObject(url)
