@@ -17,7 +17,7 @@ class Command(BaseCommand):
     
     def handle(self, *args, **options):
 
-        for collection in Collection.objects.all(status=Collection.ADDED):
+        for collection in Collection.objects.filter(status=Collection.ADDED):
 
             enlaces_iniciales = set()
             for resource in collection.resources.all():
