@@ -22,7 +22,6 @@ class Command(BaseCommand):
             enlaces_iniciales = set()
             texto = ''
             tags = set()
-
             for resource in collection.resources.all():
                 url = resource.url
                 enlaces_iniciales.add(url)
@@ -37,10 +36,11 @@ class Command(BaseCommand):
 
             alchemyapi = AlchemyAPI()
             response = alchemyapi.keywords("text", texto)
-            concept = response['keywords'][0]['text']
+            concept = response['keywords'][0]['text']   
 
             wiki = Wikipedia()
             for res in wiki.search(concept):
+                print res
                 more_links.add(res)
 
             """
@@ -51,11 +51,15 @@ class Command(BaseCommand):
                     break
             """
 
-            duck = DuckDuckGo()
+            duck = DuckDuckGoIO()
             for link in enlaces_iniciales:
+                print link
                 for res in duck.related(link):
+                    print res
                     more_links.add(res)
 
             for link in more_links:
                 identifier = hashlib.md5(url).hexdigest()
                 res, created = Resource.objects.get_or_create(identifier=identifier,url=url)
+                collection.resources.add(res)
+
