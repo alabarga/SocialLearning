@@ -22,7 +22,7 @@ class Command(BaseCommand):
             enlaces_iniciales = set()
             texto = ''
             tags = set()
-            
+
             for resource in collection.resources.all():
                 url = resource.url
                 enlaces_iniciales.add(url)
@@ -53,7 +53,7 @@ class Command(BaseCommand):
 
             duck = DuckDuckGo()
             for link in enlaces_iniciales:
-                for res in duck.search_related(link):
+                for res in duck.related(link):
                     more_links.add(res)
 
             for link in more_links:
