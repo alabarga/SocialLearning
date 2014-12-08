@@ -11,6 +11,10 @@ class CollectionAdmin(admin.ModelAdmin):
     filter_horizontal = ("resources",)
     #inlines = [ ResourceInline, ]
 
+class ResourceAdmin(admin.ModelAdmin):
+    list_display = ("identifier","title")
+    search_fields = ("identifier","title","description")
+
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Resource)
 admin.site.register(ResourceContainer)

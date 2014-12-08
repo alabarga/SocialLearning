@@ -54,14 +54,12 @@ class Command(BaseCommand):
 
             duck = DuckDuckGoIO()
             for link in enlaces_iniciales:
-                print link
                 for res in duck.related(link):
-                    print res
                     more_links.add(res)
 
             for link in more_links:
-                print link
                 identifier = hashlib.md5(url).hexdigest()
+                print '%s : %s' % (identifier, link)
                 res, created = Resource.objects.get_or_create(identifier=identifier, url=url)
                 res.save()
                 collection.resources.add(res)
