@@ -66,9 +66,8 @@ class Command(BaseCommand):
                         url = res.url
                         print url
                         res.identifier = hashlib.md5(url).hexdigest()
-                        if options['log']: print url
                         u = URLObject(url)
-                        if options['log']: print u.content_type
+                        print u.content_type
                         if 'application/pdf' in u.content_type:
                             pd = PDFParser(url).describe()
                             res.fulltext = pd.fulltext
