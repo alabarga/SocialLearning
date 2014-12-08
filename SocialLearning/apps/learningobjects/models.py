@@ -122,12 +122,14 @@ class Resource(models.Model):
 
 class Collection(models.Model):
 
-    ADDED = 0;
-    DESCRIBED = 1;
-    DISCOVERED = 2;
-    EXPANDED = 3;
+    CANCELLED = 0
+    ADDED = 1;
+    DESCRIBED = 2;
+    DISCOVERED = 3;
+    EXPANDED = 4;
 
     COL_STATUS = (
+        (CANCELLED, 'Cancelled'),        
         (ADDED, 'Added'),
         (DESCRIBED, 'Described'),
         (DISCOVERED, 'Discovered'),
@@ -138,7 +140,7 @@ class Collection(models.Model):
     description = RedactorField(null=True, blank=True)
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
     tags = TaggableManager(blank=True)
-    status = models.IntegerField(default=0, choices=COL_STATUS)
+    status = models.IntegerField(default=ADDED, choices=COL_STATUS)
 
     def __unicode__(self):
         return self.name
