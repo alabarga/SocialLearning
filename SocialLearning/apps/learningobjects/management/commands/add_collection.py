@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
         for collection in Collection.objects.filter(status=Collection.ADDED):
 
+            print collection.name
             enlaces_iniciales = set()
             texto = ''
             tags = set()
@@ -63,3 +64,4 @@ class Command(BaseCommand):
                 res, created = Resource.objects.get_or_create(identifier=identifier,url=url)
                 collection.resources.add(res)
 
+        print "Added!"
