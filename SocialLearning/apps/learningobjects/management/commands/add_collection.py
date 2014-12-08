@@ -20,6 +20,8 @@ class Command(BaseCommand):
         for collection in Collection.objects.filter(status=Collection.ADDED):
 
             enlaces_iniciales = set()
+            texto = ''
+            
             for resource in collection.resources.all():
                 url = resource.url
                 enlaces_iniciales.add(url)
