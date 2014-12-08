@@ -220,9 +220,12 @@ class DuckDuckGoIO(SearchEngine):
         res=json.loads(res)
         res=res['results']
         for li in res:
-          link=li['url']
-          if link not in links:
-            links.insert(0,link)
+            try:
+                link=li['url']
+                if link not in links:
+                    links.insert(0,link)
+            except:
+                continue
         return links         
 
     def related(self,url):
