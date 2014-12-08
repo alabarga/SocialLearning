@@ -112,9 +112,9 @@ class Command(BaseCommand):
                             sm_desc = SummaryParser(url).describe()
 
                             res.title = rp_desc.title
-                            res.description = rp_desc.cleaned_text
-                            res.fulltext = gp_desc.fulltext
-                            np = TextBlob(rp_desc.cleaned_text)
+                            res.description = sm_desc.summary
+                            res.fulltext = gp_desc.text
+                            np = TextBlob(gp_desc.text)
                             res.language = np.detect_language()
                             res.author = rp_desc.author
                             res.content_type = 'WEB'
