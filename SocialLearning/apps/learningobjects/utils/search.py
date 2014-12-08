@@ -8,6 +8,7 @@ import time
 from urlunshort import resolve
 import wikipedia
 import re
+import requests
 
 class SearchEngine(object):
 
@@ -169,9 +170,10 @@ class DuckDuckGo(SearchEngine):
         for i in [0]:
             time.sleep(2)
             url = "https://duckduckgo.com/d.js?q=%s&l=es-es&p=1&s=%d" % (urllib.quote_plus(query), i)
-
-            res = urllib2.urlopen(url).read()
-            h = re.findall('{.*?}', res)
+            user_agent = {'User-agent': 'Mozilla/5.0'}
+            res = requests.get(url, headers=user_agent)
+            #res = urllib2.urlopen(url).read()
+            h = re.findall('{.*?}', res.text)
             n = len(h) - 1
             enlaces = json.loads('['+ (','.join(h[1:n])) + ']')
             
@@ -227,7 +229,7 @@ class DuckDuckGoIO(SearchEngine):
 
         return self.search('related:'+url)
 
-        
+
 # https://api.import.io/store/data/2297660e-b775-433d-a408-8fb6d7a808e7/_query?input/webpage/url=http%3A%2F%2Fwefollow.com%2Finterest%2F3dprinting%2F62-100&_user=7d0326db-696a-436d-8aba-f6c2e1c9e921&_apikey=89Gl8Ce2tiqX949GcKQTE9hCg6NW%2FkN36WpGKEA4knjhoTTRT72%2BitSWPicKFsZ4RmTwvyMbC%2BOrPtxAvy1EGw%3D%3D
 class Slideshare(SearchEngine):
 

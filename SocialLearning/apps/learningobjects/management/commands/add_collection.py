@@ -11,7 +11,7 @@ from learningobjects.utils.alchemyapi import AlchemyAPI
 from learningobjects.utils.parsers import *
 from ftfy import fix_text
 import urllib
-
+import requests
 
 class Command(BaseCommand):
     
@@ -60,8 +60,10 @@ class Command(BaseCommand):
                     more_links.add(res)
 
             for link in more_links:
+                print link
                 identifier = hashlib.md5(url).hexdigest()
-                res, created = Resource.objects.get_or_create(identifier=identifier,url=url)
+                res, created = Resource.objects.get_or_create(identifier=identifier, url=url)
+                res.save()
                 collection.resources.add(res)
 
         print "Added!"
