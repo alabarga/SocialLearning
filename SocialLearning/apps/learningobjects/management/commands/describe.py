@@ -16,23 +16,12 @@ from textblob import TextBlob
 # python -m textblob.download_corpora
 
 class Command(BaseCommand):
-    args = 'query'
-    help = 'Expandir el numero de documentos'
-    """make_option('-v','--verbose',
-            dest='verbose',
-            help='verbose'),"""
-
-#    option_list = BaseCommand.option_list + (
-#        make_option('-u','--url',
-#            dest='URL',
-#            help='URL del recurso'),      
-#        ) 
-
+ 
     def add_arguments(self, parser):
         # Positional arguments
         parser.add_argument('-u','--url',
             dest='URL',
-            help='URL del recurso'), )
+            help='URL del recurso')
 
         #parser.add_argument('poll_id', nargs='+', type=int)
 
@@ -54,7 +43,11 @@ class Command(BaseCommand):
             if inp=="y" or inp=="yes":
                 
                 topics = Topic.objects.all()
-                resources=Resource.objects.filter(status=Resource.ADDED)
+                #resources=Resource.objects.filter(status=Resource.ADDED)
+
+                col = Collection.objects.get(pk=23)
+                resources = col.resources.all()
+
                 slides = slideshare.SlideshareAPI()
 
                 for res in resources:
