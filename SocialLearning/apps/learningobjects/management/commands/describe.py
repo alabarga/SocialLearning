@@ -127,12 +127,8 @@ class Command(BaseCommand):
                         res.status=Resource.DESCRIBED
                         res.save()
 
-                        
-                        
-                        
-
                     except:
-                        continue
+                        traceback.print_exc(file=sys.stdout)
 
         else:
 
