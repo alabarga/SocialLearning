@@ -141,7 +141,11 @@ class GooseParser(URLObject):
         g = Goose()
         try:
             a = g.extract(url=url.encode('utf-8'))  
-            self.descriptor.update(a)
+            self.descriptor.url = a.final_url
+            self.descriptor.text = a.cleaned_text
+            self.descriptor.tags = set(a.meta_keywords.split(','))
+            self.descriptor.html = a.raw_html 
+            
         except:
             pass
 

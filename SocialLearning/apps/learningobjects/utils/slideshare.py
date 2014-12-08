@@ -148,14 +148,39 @@ def callapi(func):
         return json
 
     return wrapper
+"""
+In [10]: slide['Slideshow']['ID']
+Out[10]: u'5627551'
 
+In [11]: slide['Slideshow']['DownloadUrl']
+Out[11]: u'http://s3.amazonaws.com/ppt-download/pizarrapdi-101031154123-phpapp02.pdf?response-content-disposition=attachment&Signature=iM11T%2BSZUjU8ZOx9jz8F7cIpQt8%3D&Expires=1417633527&AWSAccessKeyId=AKIAI6DXMWX6TBWAHQCQ'
 
+In [12]: slide['Slideshow']['Embed']
+Out[12]: u'<iframe src="https://www.slideshare.net/slideshow/embed_code/5627551" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/purieso/pizarra-p-di" title="Pizarra Digital e-Beam" target="_blank">Pizarra Digital e-Beam</a> </strong> from <strong><a href="http://www.slideshare.net/purieso" target="_blank">purieso</a></strong> </div>'
+
+In [13]: slide['Slideshow']['Title']
+Out[13]: u'Pizarra Digital e-Beam'
+
+In [14]: slide['Slideshow']['Description']
+Out[14]: u'Elementos b\xe1sicos de la pizarra digital e-Beam'
+
+In [15]: slide['Slideshow']['Updated']
+Out[15]: u'2010-10-31 20:47:47 UTC'
+
+In [48]: int(slide['Slideshow']['NumViews'])
+Out[48]: 3062
+
+In [49]: int(slide['Slideshow']['NumFavorites'])
+Out[49]: 0
+
+In [50]: int(slide['Slideshow']['NumDownloads'])
+"""
 
 class SlideshareAPI(object):
     api_key = None
     sharedsecret = None
 
-    def __init__(self, api_key, sharedsecret):
+    def __init__(self, api_key='lKp4aIF5', sharedsecret='x7fmnUa8'):
         if api_key and sharedsecret:
             self.sharedsecret = sharedsecret
             self.api_key = api_key

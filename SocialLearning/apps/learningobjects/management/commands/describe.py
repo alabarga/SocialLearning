@@ -10,6 +10,10 @@ import feedparser
 
 from learningobjects.utils.parsers import ReadibilityParser
 from learningobjects.utils.alchemyapi import AlchemyAPI
+from learningobjects.utils import slideshare
+from textblob import TextBlob
+# pip install -U textblob
+# python -m textblob.download_corpora
 
 class Command(BaseCommand):
     args = 'query'
@@ -51,6 +55,8 @@ class Command(BaseCommand):
                 
                 topics = Topic.objects.all()
                 resources=Resource.objects.filter(status=Resource.ADDED)
+                slides = slideshare.SlideshareAPI()
+
                 for res in resources:
 
                     try:
@@ -63,6 +69,21 @@ class Command(BaseCommand):
                             pd = PDFParser(url).describe()
                             res.fulltext = pd.fulltext
                             res.content_type = 'PDF'
+
+                        # slideshare
+                        elif bool(re.match('^(http(s|):\/\/|)(www.|)slideshare.net',u.url)):
+                            s = slides.get_slideshow(slideshow_url=u.url)
+                            res.title = slide['Slideshow']['Title']
+                            res.description = slide['Slideshow']['Description']
+                            res.author = slide['Slideshow']['Username']
+                            res.fulltext = slide['Slideshow']['Embed']
+                            res.interest = int(slide['Slideshow']['NumViews']) + int(slide['Slideshow']['NumFavorites']) + int(slide['Slideshow']['NumDownloads'])
+
+                            rc_url = 'https://www.slideshare.net/' + slide['Slideshow']['Username'] + '/presentations'
+                            rc_rss = 'http://es.slideshare.net/rss/user/' + slide['Slideshow']['Username']
+                            rc, created = ResourceContainer.objects.get_or_create(url=rc_url, rss=rc_rss, name=slide['Slideshow']['Username'] )
+                        
+                            rc.resources.add(res)
 
                         # youtube
                         elif bool(re.match('^(http(s|):\/\/|)(www.|)youtube.com',u.url)):
@@ -89,7 +110,8 @@ class Command(BaseCommand):
                             res.title = rp_desc.title
                             res.description = rp_desc.cleaned_text
                             res.fulltext = gp_desc.fulltext
-
+                            np = TextBlob(“I have good spelling!”)
+                            np.detect_language()
                             res.author = rp_desc.author
                             res.content_type = 'WEB'
 

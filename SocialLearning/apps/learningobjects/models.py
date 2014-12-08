@@ -121,10 +121,24 @@ class Resource(models.Model):
         return [t.name for t in self.relevant.all()]
 
 class Collection(models.Model):
+
+    ADDED = 0;
+    DESCRIBED = 1;
+    DISCOVERED = 2;
+    EXPANDED = 3;
+
+    COL_STATUS = (
+        (ADDED, 'Added'),
+        (DESCRIBED, 'Described'),
+        (DISCOVERED, 'Discovered'),
+        (EXPANDED, 'Expanded'),
+    )
+
     name = models.CharField(max_length=255)
     description = RedactorField(null=True, blank=True)
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
     tags = TaggableManager(blank=True)
+    status = models.IntegerField(default=0, choices=COL_STATUS)
 
     def __unicode__(self):
         return self.name

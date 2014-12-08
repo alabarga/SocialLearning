@@ -45,6 +45,7 @@ def _strip_protocol(url):
 
 
 class GoogleCustomSearch(object):
+
     def __init__(self, search_engine_id, api_key):
         self.search_engine_id = search_engine_id
         self.api_key = api_key
@@ -54,6 +55,7 @@ class GoogleCustomSearch(object):
 
         for start_index in range(1, max_results, 10):  # 10 is max page size
             url = self._make_url(start_index, keyword, site)
+            print url
             logging.info(url)
 
             response = requests.get(url)

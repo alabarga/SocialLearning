@@ -1,4 +1,4 @@
-from google_search import GoogleCustomSearch
+from learningobjects.utils.google import search as search_google
 import sha
 import xml.etree.ElementTree as ET
 import unfurl
@@ -6,6 +6,7 @@ import urllib2, urllib
 import json
 import time
 from urlunshort import resolve
+import wikipedia
 
 class SearchEngine(object):
 
@@ -90,6 +91,44 @@ class Google(SearchEngine):
     def search(self,query):
         links=[]        
 
+        for result in search_google(query):
+            links.append(result)
+
+        return links
+
+class XGoogle(SearchEngine):
+    
+    def __init__(self):
+        super(XGoogle, self).__init__("xgoogle")
+
+    #Busca en google con los parametros que se pasen
+    def search(self,query):
+        from xgoogle.search import GoogleSearch, SearchError
+        links = []
+        try:
+            gs = GoogleSearch(query)
+            gs.results_per_page = 50
+            results = gs.get_results()
+            for res in results:
+                links.append(res.url.encode('utf8'))
+                print res.title.encode('utf8')
+                print res.desc.encode('utf8')
+                print res.url.encode('utf8')
+        except SearchError:
+            print "Search failed!"
+
+        return links
+
+
+"""
+class Google(SearchEngine):
+    def __init__(self):
+        super(Google, self).__init__("google")
+
+    #Busca en google con los parametros que se pasen
+    def search(self,query):
+        links=[]        
+
         SEARCH_ENGINE_ID = '009363772985848074726:jxffracj2_8' #os.environ['SEARCH_ENGINE_ID']                          
         API_KEY = 'AIzaSyCE9D6fjIW86IN2uekwJbaS3TDfNbim-lE' #os.environ['GOOGLE_CLOUD_API_KEY']
         googleApi = GoogleCustomSearch(SEARCH_ENGINE_ID, API_KEY)
@@ -99,6 +138,67 @@ class Google(SearchEngine):
 
             links.insert(0,link)
         return links
+
+"""
+
+class Wikipedia(SearchEngine):
+
+    def __init__(self):
+        super(Wikipedia, self).__init__("wikipedia")   
+
+    def search(self,query):
+        links = []
+        wikipedia.set_lang("es")
+        ids = wikipedia.search(query)
+        for id in ids:
+            wiki = wikipedia.page(id)
+            refs = wiki.references
+            links.extend(refs)
+
+        return links
+
+class DuckDuckGo(SearchEngine):
+
+    def __init__(self):
+        super(DuckDuckGo, self).__init__("duckduckgo")   
+
+    def search(self,query):
+
+        links = []
+        for i in [0]:
+            time.sleep(2)
+            url = "https://duckduckgo.com/d.js?q=%s&l=es-es&p=1&s=%d" % (urllib.quote_plus(query), i)
+
+            res = urllib2.urlopen(url).read()
+            h = re.findall('{.*?}', res)
+            n = len(h) - 1
+            enlaces = json.loads('['+ (','.join(h[1:n])) + ']')
+            
+            for item in enlaces:
+                links.append(item['c'])
+
+    def related(self,url):
+
+        return self.search('related:'+url)
+
+class DuckDuckGoAPI(SearchEngine):
+
+    def __init__(self):
+        super(DuckDuckGoIO, self).__init__("duckduckgo")   
+
+    def search(self,query):
+        import json
+        import urllib.request
+        url = "http://api.duckduckgo.com/?q=%s&format=json&pretty=1" % urllib.quote(query)
+        get_ddg = urllib.request.urlopen(url)
+        ddg_read = get_ddg.read()
+        ddg_read_decode = json.loads(ddg_read.decode('utf-8'))
+        ddg_read = ddg_read_decode
+        json_string = json.dumps(ddg_read,sort_keys=True,indent=2)
+        print(json_string)
+        ddg_topics = ddg_read['RelatedTopics']
+        for item in ddg_topics:
+            print(item['FirstURL'])
 
 class DuckDuckGoIO(SearchEngine):
 

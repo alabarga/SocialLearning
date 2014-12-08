@@ -4,9 +4,12 @@ from django.contrib import admin
 
 from learningobjects.models import *
 
+class ResourceInline(admin.TabularInline):
+    model = Collection.resources.through
+
 class CollectionAdmin(admin.ModelAdmin):
     filter_horizontal = ("resources",)
-
+    #inlines = [ ResourceInline, ]
 
 admin.site.register(Collection, CollectionAdmin)
 admin.site.register(Resource)
