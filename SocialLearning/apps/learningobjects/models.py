@@ -90,7 +90,10 @@ class Resource(models.Model):
     fulltext = RedactorField(null=True, blank=True) 
 
     def __unicode__(self):
-        return self.title
+        if self.title is None:
+            return self.url
+        else
+            return self.title
 
     @property
     def interest(self):

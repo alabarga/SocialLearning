@@ -17,6 +17,16 @@ from textblob import TextBlob
 
 class Command(BaseCommand):
  
+    option_list = BaseCommand.option_list + (
+        make_option('-q','--query',
+            dest='query',
+            help='Palabra clave a buscar'),
+        )+(
+        make_option('-u','--url',
+            dest='URL',
+            help='URL del recurso'),
+        )
+
     def add_arguments(self, parser):
         # Positional arguments
         parser.add_argument('-u','--url',
