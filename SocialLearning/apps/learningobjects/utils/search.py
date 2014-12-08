@@ -7,6 +7,7 @@ import json
 import time
 from urlunshort import resolve
 import wikipedia
+import re
 
 class SearchEngine(object):
 
