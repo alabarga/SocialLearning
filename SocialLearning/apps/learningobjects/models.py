@@ -92,7 +92,7 @@ class Resource(models.Model):
     def __unicode__(self):
         if self.title is None:
             return self.url
-        else
+        else:
             return self.title
 
     @property
