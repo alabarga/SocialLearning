@@ -64,10 +64,9 @@ class Command(BaseCommand):
 
                     try:
                         url = res.url
-                        print url
                         res.identifier = hashlib.md5(url).hexdigest()
                         u = URLObject(url)
-                        print u.content_type
+                        print "%s (%s)" % (u.url, u.content_type)
                         if 'application/pdf' in u.content_type:
                             pd = PDFParser(url).describe()
                             res.fulltext = pd.fulltext
