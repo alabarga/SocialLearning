@@ -58,9 +58,9 @@ class Command(BaseCommand):
                     more_links.add(res)
 
             for link in more_links:
-                identifier = hashlib.md5(url).hexdigest()
+                identifier = hashlib.md5(link).hexdigest()
                 print '%s : %s' % (identifier, link)
-                res, created = Resource.objects.get_or_create(identifier=identifier, url=url)
+                res, created = Resource.objects.get_or_create(identifier=identifier, url=link)
                 res.save()
                 collection.resources.add(res)
 
