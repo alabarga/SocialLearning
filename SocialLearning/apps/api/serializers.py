@@ -223,6 +223,16 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
         url_field_name = 'topic'
         fields = ('topic', 'name', 'tags', 'relevance')
 
+class TopicDetailSerializer(serializers.HyperlinkedModelSerializer):
+
+    tags = TagListSerializer(blank=True)
+
+    class Meta:
+        model = Topic
+        url_field_name = 'topic'
+        fields = ('topic', 'name', 'description', 'tags')
+
+
 """
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -234,10 +244,11 @@ class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
     
+    topics = TopicDetailSerializer(many=True, read_only=True)
     resources = ResourceDetailSerializer(many=True, read_only=True)
     class Meta:
         model = Collection
-        fields = ('url', 'name', 'description', 'resources',)
+        fields = ('url', 'name', 'description', 'topics', 'resources',)
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     
