@@ -2,6 +2,11 @@ from django.forms import widgets
 from rest_framework import serializers
 from learningobjects.models import *
 
+
+#######################################################################
+# View API
+#######################################################################
+
 class TagListSerializer(serializers.WritableField):
 
     def from_native(self, data):
@@ -234,13 +239,6 @@ class CollectionSerializer(serializers.HyperlinkedModelSerializer):
         model = Collection
         fields = ('url', 'name', 'description', 'resources',)
 
-class CollectionUpdateSerializer(serializers.HyperlinkedModelSerializer):
-    
-    resources = serializers.PrimaryKeyRelatedField(many=True)
-    class Meta:
-        model = Collection
-        fields = ('url', 'name', 'description', 'resources',)
-
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
     
     social_network = serializers.RelatedField()
@@ -262,8 +260,30 @@ class MentionSerializer(serializers.HyperlinkedModelSerializer):
         url_field_name = 'mention_url'
         fields = ('mention_url', 'profile','resource', 'mention','card')         
 
+#######################################################################
+# Update API
+#######################################################################
+
+class CollectionUpdateSerializer(serializers.HyperlinkedModelSerializer):
+    
+    resources = serializers.PrimaryKeyRelatedField(many=True)
+    class Meta:
+        model = Collection
+        fields = ('url', 'name', 'description', 'resources',)
 
 
+class TopicUpdateSerializer(serializers.HyperlinkedModelSerializer):
 
+    tags = TagListSerializer(blank=True)
+    collection = serializers.HyperlinkedRelatedField(view_name='collection-detail')
+    class Meta:
+        model = Topic
+        url_field_name = 'topic'
+        fields = ('collection', 'name', 'description', 'tags')
 
+class InterestUpdateSerializer(serializers.HyperlinkedModelSerializer):
 
+    class Meta:
+        model = Resource
+        url_field_name = 'topic'
+        fields = ('interest_hontza', 'interest_social', 'interest_resource')        

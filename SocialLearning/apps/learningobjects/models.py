@@ -151,7 +151,7 @@ class Collection(models.Model):
 class Topic(models.Model): 
     collection = models.ForeignKey(Collection,related_name="topics",)
     name = models.CharField(max_length=255)
-    descripcion = RedactorField(null=True, blank=True)
+    description = RedactorField(null=True, blank=True)
     tags = TaggableManager(blank=True)    
 
     def __unicode__(self):

@@ -47,7 +47,7 @@ from rest_framework import routers
 from api import views
 
 router = routers.DefaultRouter()
-router.register(r'resources', views.DualSerializerViewSet)
+router.register(r'resources', views.ResourceViewSet)
 router.register(r'collections', views.CollectionViewSet)
 router.register(r'mentions', views.MentionViewSet)
 router.register(r'profiles', views.ProfileViewSet)
@@ -58,9 +58,11 @@ router.register(r'feeds', views.ResourceContainerViewSet)
 
 update_router = routers.DefaultRouter()
 update_router.register(r'collection', views.CollectionUpdateViewSet)
+update_router.register(r'topic', views.TopicUpdateViewSet)
+update_router.register(r'interest', views.InterestUpdateViewSet)
 
 urlpatterns += patterns('',
-    url(r'noticias/', views.ResourceSearch.as_view()),
-    url(r'api/', include(router.urls)),
-    url(r'update/', include(update_router.urls)),    
+    url(r'search/', views.ResourceSearch.as_view()),    
+    url(r'update/', include(update_router.urls)), 
+    url(r'api/', include(router.urls)),   
 )

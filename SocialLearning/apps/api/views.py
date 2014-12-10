@@ -9,19 +9,35 @@ from rest_framework import viewsets
 from rest_framework import filters
 import django_filters
 
+
+#######################################################################
+# Search API
+#######################################################################
+
 class ResourceFilter(django_filters.FilterSet):
     interest = django_filters.NumberFilter(name="_interest", lookup_type='gte')
+    interest_hontza = django_filters.NumberFilter(name="interest_hontza", lookup_type='gte')
     title = django_filters.CharFilter(name="title", lookup_type='icontains')
+    tags = django_filters.CharFilter(name="tags", lookup_type='icontains')
     socialnetwork = django_filters.CharFilter(name="seen_at__social", lookup_type='icontains')
     username = django_filters.CharFilter(name="seen_at__username", lookup_type='icontains')
+    description = django_filters.CharFilter(name="description", lookup_type='icontains')
+    topic = django_filters.CharFilter(name="relevant__name", lookup_type='icontains')
+    relevance = django_filters.NumberFilter(name="relevant__relevance__score", lookup_type='gte')
+
     class Meta:
         model = Resource
-        fields = ['interest', 'title', 'socialnetwork', 'username']
+        fields = [ 'title', 'description', 'tags', 'content', 'language', 'interest', 'interest_hontza', 'topic', 'relevance', 'socialnetwork', 'username']
 
+class ResourceSearch(generics.ListAPIView):
+    queryset = Resource.objects.all()
+    serializer_class = ResourceDetailSerializer
+    filter_class = ResourceFilter
+
+"""    
 class ResourceSearch(APIView):
-    """
-    List all snippets, or create a new snippet.
-    """
+    #List all snippets, or create a new snippet.
+    
     def get(self, request, format=None):
 
         interest = request.GET.get('interest', None)
@@ -29,15 +45,20 @@ class ResourceSearch(APIView):
         resources = Resource.objects.filter(_interest__gte=interest)
         serializer = ResourceDetailSerializer(resources, many=True, context={'request': request})
         return Response(serializer.data)
+"""
 
+#######################################################################
+# View API
+#######################################################################
+
+"""
 class ResourceViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
+
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
+"""
 
-class DualSerializerViewSet(viewsets.ModelViewSet):
+class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = ResourceFilter
@@ -55,13 +76,6 @@ class ResourceContainerViewSet(viewsets.ModelViewSet):
     """
     queryset = ResourceContainer.objects.all()
     serializer_class = ResourceContainerSerializer
-
-class CollectionUpdateViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = Collection.objects.all()
-    serializer_class = CollectionUpdateSerializer 
 
 class CollectionViewSet(viewsets.ModelViewSet):
     """
@@ -97,3 +111,28 @@ class RelevanceViewSet(viewsets.ModelViewSet):
     """
     queryset = Relevance.objects.all().order_by('-score')
     serializer_class = RelevanceSerializer   
+
+#######################################################################
+# Update API
+#######################################################################
+
+class CollectionUpdateViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Collection.objects.all()
+    serializer_class = CollectionUpdateSerializer 
+
+class TopicUpdateViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Topic.objects.all()
+    serializer_class = TopicUpdateSerializer 
+
+class InterestUpdateViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Resource.objects.all()
+    serializer_class = InterestUpdateSerializer     
