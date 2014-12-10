@@ -31,21 +31,14 @@ class SocialProfile(models.Model):
         return self.username + '@' + str(self.social_network)
 
 class ResourceContainer(models.Model):    
-    url = models.URLField()
+    url = models.URLField(null=True, blank=True)
     rss = models.URLField()
     name = models.CharField(max_length=255, null=True, blank=True)
     descripcion = RedactorField(null=True, blank=True)
     last_processed = models.DateTimeField(null=True, blank=True)
-
+    
     def __unicode__(self):
         return self.url 
-
-class Topic(models.Model): 
-    name = models.CharField(max_length=255)
-    tags = TaggableManager()    
-
-    def __unicode__(self):
-        return self.name
 
 class Resource(models.Model):
 
@@ -75,19 +68,26 @@ class Resource(models.Model):
 
     identifier = models.CharField(max_length=40, null=True, blank=True, unique=True)
     title = models.CharField(max_length=255, null=True, blank=True)
-    language = models.CharField(max_length=255, null=True, blank=True)
     url = models.URLField()
     domain = models.CharField(max_length=255,null=True, blank=True)
     content = models.CharField(max_length=10, default='WEB', choices=RESOURCES_TYPE )
-    container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)
+    language = models.CharField(max_length=255, null=True, blank=True)
+
     description = RedactorField(null=True, blank=True)    
-    seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
-    relevant = models.ManyToManyField(Topic, null=True, blank=True, related_name='resources', through='Relevance')
+    fulltext = RedactorField(null=True, blank=True) 
+    tags = TaggableManager(blank=True)
+
     last_processed = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0, choices=RESOURCES_STATUS )
-    tags = TaggableManager(blank=True)
+
     _interest = models.FloatField(default=0.0)
-    fulltext = RedactorField(null=True, blank=True) 
+    interest_hontza = models.FloatField(default=0.0)
+    interest_resource = models.FloatField(default=0.0)
+    interest_social = models.FloatField(default=0.0)
+
+    container = models.ForeignKey(ResourceContainer,related_name="resources", null=True, blank=True)    
+    seen_at = models.ManyToManyField(SocialProfile, null=True, blank=True, related_name='resources', through='Mention')
+    relevant = models.ManyToManyField('Topic', null=True, blank=True, related_name='resources', through='Relevance')
 
     def __unicode__(self):
         if self.title is None:
@@ -144,6 +144,15 @@ class Collection(models.Model):
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
     tags = TaggableManager(blank=True)
     status = models.IntegerField(default=ADDED, choices=COL_STATUS)
+
+    def __unicode__(self):
+        return self.name
+
+class Topic(models.Model): 
+    collection = models.ForeignKey(Collection,related_name="topics",)
+    name = models.CharField(max_length=255)
+    descripcion = RedactorField(null=True, blank=True)
+    tags = TaggableManager(blank=True)    
 
     def __unicode__(self):
         return self.name

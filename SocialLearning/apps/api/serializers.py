@@ -204,7 +204,8 @@ class ResourceContainerSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ResourceContainer
-        fields = ('name', 'url','rss')
+        url_field_name = 'container'
+        fields = ('container', 'name', 'url','rss')
 
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):

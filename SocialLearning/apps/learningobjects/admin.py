@@ -7,9 +7,12 @@ from learningobjects.models import *
 class ResourceInline(admin.TabularInline):
     model = Collection.resources.through
 
+class TopicInline(admin.TabularInline):
+    model = Topic
+
 class CollectionAdmin(admin.ModelAdmin):
     filter_horizontal = ("resources",)
-    #inlines = [ ResourceInline, ]
+    inlines = [ TopicInline, ]
 
 class ResourceAdmin(admin.ModelAdmin):
     list_display = ("identifier","title")
