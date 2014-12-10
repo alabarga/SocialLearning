@@ -40,6 +40,25 @@ class ResourceRelevanceSerializer(serializers.HyperlinkedModelSerializer):
         model = Relevance
         fields = ('resource', 'name', 'score')  
 
+class TopicShortSerializer(serializers.HyperlinkedModelSerializer):
+
+    #topic = serializers.HyperlinkedRelatedField(view_name='topic-detail')    #serializers.RelatedField() 
+    #resource = serializers.HyperlinkedRelatedField(view_name='resource-detail') #ResourceIdSerializer()
+
+    name = serializers.SerializerMethodField('get_name')
+
+    def get_name(self, obj):
+        return obj.topic.name
+
+    tags = serializers.SerializerMethodField('get_tags')
+
+    def get_tags(self, obj):
+        return [tag.name for tag in obj.topic.tags.all()] 
+
+    class Meta:
+        model = Relevance
+        fields = ('name', 'tags', 'score')  
+
 class TopicRelevanceSerializer(serializers.HyperlinkedModelSerializer):
 
     topic = serializers.HyperlinkedRelatedField(view_name='topic-detail')    #serializers.RelatedField() 
@@ -144,7 +163,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     mentions = MentionShortSerializer(many=True, read_only=True)
 
-    topics = TopicRelevanceSerializer(many=True, read_only=True)
+    topics = TopicShortSerializer(many=True, read_only=True)
 
     tags = TagListSerializer(blank=True)
 

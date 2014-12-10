@@ -24,10 +24,11 @@ class ResourceFilter(django_filters.FilterSet):
     description = django_filters.CharFilter(name="description", lookup_type='icontains')
     topic = django_filters.CharFilter(name="relevant__name", lookup_type='icontains')
     relevance = django_filters.NumberFilter(name="relevant__relevance__score", lookup_type='gte')
+    site = django_filters.CharFilter(name="domain", lookup_type='icontains')
 
     class Meta:
         model = Resource
-        fields = [ 'title', 'description', 'tags', 'content', 'language', 'interest', 'interest_hontza', 'topic', 'relevance', 'socialnetwork', 'username']
+        fields = [ 'title', 'description', 'tags', 'content', 'language', 'site', 'interest', 'interest_hontza', 'topic', 'relevance', 'socialnetwork', 'username']
 
 class ResourceSearch(generics.ListAPIView):
     queryset = Resource.objects.all()
