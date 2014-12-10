@@ -212,7 +212,6 @@ class ResourceContainerSerializer(serializers.HyperlinkedModelSerializer):
         url_field_name = 'container'
         fields = ('container', 'name', 'url','rss')
 
-
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
     relevance = ResourceRelevanceSerializer(many=True)
@@ -232,7 +231,6 @@ class TopicDetailSerializer(serializers.HyperlinkedModelSerializer):
         url_field_name = 'topic'
         fields = ('topic', 'name', 'description', 'tags')
 
-
 """
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -245,7 +243,8 @@ class CollectionSerializer(serializers.HyperlinkedModelSerializer):
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
     
     topics = TopicDetailSerializer(many=True, read_only=True)
-    resources = ResourceDetailSerializer(many=True, read_only=True)
+    feeds = ResourceContainerSerializer(many=True, read_only=True)
+    resources = ResourceDetailSerializer(many=True, read_only=True)    
     class Meta:
         model = Collection
         fields = ('url', 'name', 'description', 'topics', 'resources',)
@@ -277,10 +276,12 @@ class MentionSerializer(serializers.HyperlinkedModelSerializer):
 
 class CollectionUpdateSerializer(serializers.HyperlinkedModelSerializer):
     
+    topics = serializers.PrimaryKeyRelatedField(many=True)
     resources = serializers.PrimaryKeyRelatedField(many=True)
+    feeds = serializers.PrimaryKeyRelatedField(many=True)
     class Meta:
         model = Collection
-        fields = ('url', 'name', 'description', 'resources',)
+        fields = ('url', 'name', 'description', 'feeds', 'topics', 'resources')
 
 
 class TopicUpdateSerializer(serializers.HyperlinkedModelSerializer):

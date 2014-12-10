@@ -56,10 +56,16 @@ router.register(r'relevance', views.RelevanceViewSet)
 router.register(r'feeds', views.ResourceContainerViewSet)
 #router.register(r'noticias', views.ResourceSearch, base_name='noticias')
 
+
+#http://social.hontza.es/update/topic/", 
+#http://social.hontza.es/update/collection/", 
+#http://social.hontza.es/update/interest/"
+
 update_router = routers.DefaultRouter()
 update_router.register(r'collection', views.CollectionUpdateViewSet)
 update_router.register(r'topic', views.TopicUpdateViewSet)
 update_router.register(r'interest', views.InterestUpdateViewSet)
+update_router.register(r'feed', views.ResourceContainerViewSet)
 
 urlpatterns += patterns('',
     url(r'search/', views.ResourceSearch.as_view()),    

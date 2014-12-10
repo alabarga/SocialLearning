@@ -140,10 +140,11 @@ class Collection(models.Model):
     )
 
     name = models.CharField(max_length=255)
-    description = RedactorField(null=True, blank=True)
-    resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
+    description = RedactorField(null=True, blank=True) 
     tags = TaggableManager(blank=True)
     status = models.IntegerField(default=ADDED, choices=COL_STATUS)
+    resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
+    feeds = models.ManyToManyField(ResourceContainer, null=True, blank=True, related_name="collection")
 
     def __unicode__(self):
         return self.name
@@ -158,8 +159,8 @@ class Topic(models.Model):
         return self.name
 
 class Mention(models.Model): 
-    profile = models.ForeignKey(SocialProfile,related_name="mentions",)
-    resource = models.ForeignKey(Resource,related_name="mentions",)
+    profile = models.ForeignKey(SocialProfile, related_name="mentions",)
+    resource = models.ForeignKey(Resource, related_name="mentions",)
     card = RedactorField(null=True, blank=True)
     tags = TaggableManager(blank=True)
 
