@@ -20,16 +20,12 @@ class RSSRenderer(renderers.BaseRenderer):
         fg = FeedGenerator()
         myclass = type(renderer_context['view']).__name__ 
 
-        print renderer_context['request']
-        print myclass
-
-        if myclass == 'CollectionViewSet':
-           
+        if myclass == 'CollectionViewSet':           
             feed_url = data['url']
             feed_title = data['name']
             feed_description = data['description']
             resources = data['resources']
-        elif myclass == 'ResourceViewSet':
+        elif myclass in ['ResourceViewSet','ResourceSearch']:
             feed_url = "http://social.honzta.es/api/resources/"
             feed_title = "SocialLearning resources"
             feed_description = "SocialLearning resources"
@@ -51,9 +47,9 @@ class RSSRenderer(renderers.BaseRenderer):
 
         for item in resources:
             fe = fg.add_entry()
-            fe.id(item['url'] or 'http://social.honzta.es/api/resources/1/')
-            fe.title(item['title'] or 'title')
-            #fe.link(item['url'])
+            fe.id(item['resource'] or 'http://social.honzta.es/api/resources/1/')
+            fe.title(item['title'] or 'Not available')
+            fe.link({'href':item['url'] or 'http://social.honzta.es/api/resources/1/'})
             #fe.content(item['title'])
             #fe.description(item['description'])
 
