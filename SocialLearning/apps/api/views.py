@@ -18,17 +18,18 @@ class ResourceFilter(django_filters.FilterSet):
     interest = django_filters.NumberFilter(name="_interest", lookup_type='gte')
     interest_hontza = django_filters.NumberFilter(name="interest_hontza", lookup_type='gte')
     title = django_filters.CharFilter(name="title", lookup_type='icontains')
-    tags = django_filters.CharFilter(name="tags", lookup_type='icontains')
-    socialnetwork = django_filters.CharFilter(name="seen_at__social", lookup_type='icontains')
+    tags = django_filters.CharFilter(name="tags__name", lookup_type='icontains')
+    socialnetwork = django_filters.CharFilter(name="seen_at__social_network__name", lookup_type='icontains')
     username = django_filters.CharFilter(name="seen_at__username", lookup_type='icontains')
     description = django_filters.CharFilter(name="description", lookup_type='icontains')
     topic = django_filters.CharFilter(name="relevant__name", lookup_type='icontains')
     relevance = django_filters.NumberFilter(name="relevant__relevance__score", lookup_type='gte')
     site = django_filters.CharFilter(name="domain", lookup_type='icontains')
+    collection = django_filters.NumberFilter(name="collection")
 
     class Meta:
         model = Resource
-        fields = [ 'title', 'description', 'tags', 'content', 'language', 'site', 'interest', 'interest_hontza', 'topic', 'relevance', 'socialnetwork', 'username']
+        fields = [ 'collection','title', 'description', 'tags', 'content', 'language', 'site', 'interest', 'interest_hontza', 'topic', 'relevance', 'socialnetwork', 'username']
 
 class ResourceSearch(generics.ListAPIView):
     queryset = Resource.objects.all()
