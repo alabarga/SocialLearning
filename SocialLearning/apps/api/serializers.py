@@ -226,11 +226,11 @@ class ResourceIdSerializer(serializers.HyperlinkedModelSerializer):
 
 class ResourceContainerSerializer(serializers.HyperlinkedModelSerializer):
 
-    collection = serializers.HyperlinkedRelatedField(view_name='collection-detail')
+    collection = serializers.HyperlinkedRelatedField(view_name='collection-detail', many=True)
     class Meta:
         model = ResourceContainer
         url_field_name = 'container'
-        fields = ('container', 'collection', 'name', 'url','rss')
+        fields = ('container', 'collection', 'name', 'url', 'rss')
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
 

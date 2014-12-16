@@ -10,15 +10,19 @@ from rest_framework import filters
 import django_filters
 
 
+
 #######################################################################
 # Search API
 #######################################################################
 
+class ListFilter(django_filters.Filter):
+    def filter(self, qs, value):
+        return super(ListFilter, self).filter(qs, [value.split(","), 'in'])
+
 class ResourceFilter(django_filters.FilterSet):
     interest = django_filters.NumberFilter(name="_interest", lookup_type='gte')
     interest_hontza = django_filters.NumberFilter(name="interest_hontza", lookup_type='gte')
-    title = django_filters.CharFilter(name="title", lookup_type='icontains')
-    tags = django_filters.CharFilter(name="tags__name", lookup_type='icontains')
+    title = django_filters.CharFilter(name="title", lookup_type='icontains')   
     socialnetwork = django_filters.CharFilter(name="seen_at__social_network__name", lookup_type='icontains')
     username = django_filters.CharFilter(name="seen_at__username", lookup_type='icontains')
     description = django_filters.CharFilter(name="description", lookup_type='icontains')
@@ -26,6 +30,10 @@ class ResourceFilter(django_filters.FilterSet):
     relevance = django_filters.NumberFilter(name="relevant__relevance__score", lookup_type='gte')
     site = django_filters.CharFilter(name="domain", lookup_type='icontains')
     collection = django_filters.NumberFilter(name="collection")
+    #tags = django_filters.CharFilter(name="tags__name", lookup_type='icontains')
+    #collection = django_filters.MultipleChoiceFilter(name="collection")
+    #collection = ListFilter(name='collection')
+    tags = ListFilter(name='tags__name')
 
     class Meta:
         model = Resource
