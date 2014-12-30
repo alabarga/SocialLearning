@@ -287,7 +287,12 @@ class Common(Configuration):
             #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
             'rest_framework.permissions.AllowAny',
         ],
-        'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
+
+        'DEFAULT_FILTER_BACKENDS': (
+            'rest_framework.filters.SearchFilter',
+            'rest_framework.filters.DjangoFilterBackend',
+            'rest_framework.filters.OrderingFilter',
+        ),
 
         'DEFAULT_RENDERER_CLASSES': (
             'rest_framework.renderers.JSONRenderer',

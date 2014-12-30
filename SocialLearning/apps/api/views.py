@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework import filters
 import django_filters
+from django_filters.fields import Lookup
 
 
 
@@ -17,7 +18,8 @@ import django_filters
 
 class ListFilter(django_filters.Filter):
     def filter(self, qs, value):
-        return super(ListFilter, self).filter(qs, [value.split(","), 'in'])
+        print value
+        return super(ListFilter, self).filter(qs, Lookup( [int(i) for i in value.split(',')], 'in'))
 
 class ResourceFilter(django_filters.FilterSet):
     interest = django_filters.NumberFilter(name="_interest", lookup_type='gte')
@@ -29,10 +31,10 @@ class ResourceFilter(django_filters.FilterSet):
     topic = django_filters.CharFilter(name="relevant__name", lookup_type='icontains')
     relevance = django_filters.NumberFilter(name="relevant__relevance__score", lookup_type='gte')
     site = django_filters.CharFilter(name="domain", lookup_type='icontains')
-    collection = django_filters.NumberFilter(name="collection")
+    #collection = django_filters.NumberFilter(name="collection")
     #tags = django_filters.CharFilter(name="tags__name", lookup_type='icontains')
     #collection = django_filters.MultipleChoiceFilter(name="collection")
-    #collection = ListFilter(name='collection')
+    collection = ListFilter(name='collection')
     tags = ListFilter(name='tags__name')
 
     class Meta:
@@ -43,6 +45,19 @@ class ResourceSearch(generics.ListAPIView):
     queryset = Resource.objects.all()
     serializer_class = ResourceDetailSerializer
     filter_class = ResourceFilter
+
+    """
+    def get_queryset(self):
+
+        ## Override get_queryset() to filter on multiple values for 'id'
+
+        id_value = self.request.QUERY_PARAMS.get('id', None)
+        if id_value:
+            id_list = id_value.split(',')
+            queryset = queryset.filter(id__in=id_list)
+
+        return queryset
+    """
 
 """    
 class ResourceSearch(APIView):
