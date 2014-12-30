@@ -165,7 +165,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
 
     topics = TopicShortSerializer(many=True, read_only=True)
 
-    tags = TagListSerializer(blank=True)
+    tags = TagListSerializer(required=False)
 
     # resource = serializers.CharField(source='get_absolute_url', read_only=True)
 
@@ -184,7 +184,7 @@ class ResourceDetailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Resource
         url_field_name = 'resource'
-        fields = ('resource', 'collection','url', 'title', 'description', 'tags', 'interest', 'topic_list', 'topics', 'mentions')        
+        fields = ('resource', 'collection','url', 'title', 'description', 'status', 'tags', 'interest', 'interest_hontza','interest_social','interest_resource', 'topic_list', 'topics', 'mentions')        
 
 class ResourceMongoSerializer(serializers.ModelSerializer):
 
@@ -235,7 +235,7 @@ class ResourceContainerSerializer(serializers.HyperlinkedModelSerializer):
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
     relevance = ResourceRelevanceSerializer(many=True)
-    tags = TagListSerializer(blank=True)
+    tags = TagListSerializer(required=False)
 
     class Meta:
         model = Topic
@@ -244,7 +244,7 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
 class TopicDetailSerializer(serializers.HyperlinkedModelSerializer):
 
-    tags = TagListSerializer(blank=True)
+    tags = TagListSerializer(required=False)
 
     class Meta:
         model = Topic
@@ -306,7 +306,7 @@ class CollectionUpdateSerializer(serializers.HyperlinkedModelSerializer):
 
 class TopicUpdateSerializer(serializers.HyperlinkedModelSerializer):
 
-    tags = TagListSerializer(blank=True)
+    tags = TagListSerializer(required=False)
     collection = serializers.HyperlinkedRelatedField(view_name='collection-detail')
     class Meta:
         model = Topic
