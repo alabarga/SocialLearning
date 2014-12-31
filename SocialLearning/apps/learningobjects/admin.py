@@ -27,6 +27,7 @@ admin.site.register(Mention)
 admin.site.register(Topic)
 admin.site.register(Relevance)
 admin.site.register(SocialProfile)
+admin.site.register(File)
 
 
 

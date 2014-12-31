@@ -9,8 +9,42 @@ from rest_framework import viewsets
 from rest_framework import filters
 import django_filters
 from django_filters.fields import Lookup
+from rest_framework.parsers import MultiPartParser, FormParser
 
+class AddFile(APIView):
+    queryset = File.objects.all()
+    serializer_class = AssetSerializer
+    parser_classes = (MultiPartParser, FormParser,)
 
+    def post_dos(self, request, format=None):
+        my_file = request.FILES['file_field_name']
+        filename = '/tmp/myfile'
+        with open(filename, 'wb+') as temp_file:
+            for chunk in my_file.chunks():
+                temp_file.write(chunk)
+
+        my_saved_file = open(filename) #there you go
+
+    def post_original(self, request, format=None):
+        serializer = AssetSerializer(data=request.DATA)
+        print serializer.data
+
+        if serializer.is_valid():
+
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, format=None):
+        serializer = AssetSerializer(data=request.DATA, files=request.FILES)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#curl -X POST 127.0.0.1:8000/update/files/ -d '{"name" = "my image   ","source"="/home/alabarga/Downloads/social.jpg"}' -H "Content-Type: application/json"
 
 #######################################################################
 # Search API

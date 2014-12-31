@@ -54,6 +54,7 @@ router.register(r'profiles', views.ProfileViewSet)
 router.register(r'topics', views.TopicViewSet)
 router.register(r'relevance', views.RelevanceViewSet)
 router.register(r'feeds', views.ResourceContainerViewSet)
+
 #router.register(r'noticias', views.ResourceSearch, base_name='noticias')
 
 
@@ -61,11 +62,56 @@ router.register(r'feeds', views.ResourceContainerViewSet)
 #http://social.hontza.es/update/collection/", 
 #http://social.hontza.es/update/interest/"
 
-update_router = routers.DefaultRouter()
+import rest_framework
+from rest_framework import reverse, response
+class HybridRouter(routers.DefaultRouter):
+    def __init__(self, *args, **kwargs):
+        super(HybridRouter, self).__init__(*args, **kwargs)
+        self._api_view_urls = {}
+    def add_api_view(self, name, url):
+        self._api_view_urls[name] = url
+    def remove_api_view(self, name):
+        del self._api_view_urls[name]
+    @property
+    def api_view_urls(self):
+        ret = {}
+        ret.update(self._api_view_urls)
+        return ret
+
+    def get_urls(self):
+        urls = super(HybridRouter, self).get_urls()
+        for api_view_key in self._api_view_urls.keys():
+            urls.append(self._api_view_urls[api_view_key])
+        return urls
+
+    def get_api_root_view(self):
+        # Copy the following block from Default Router
+        api_root_dict = {}
+        list_name = self.routes[0].name
+        for prefix, viewset, basename in self.registry:
+            api_root_dict[prefix] = list_name.format(basename=basename)
+        api_view_urls = self._api_view_urls
+
+        class APIRoot(rest_framework.views.APIView):
+            _ignore_model_permissions = True
+
+            def get(self, request, format=None):
+                ret = {}
+                for key, url_name in api_root_dict.items():
+                    ret[key] = reverse.reverse(url_name, request=request, format=format)
+                # In addition to what had been added, now add the APIView urls
+                for api_view_key in api_view_urls.keys():
+                    ret[api_view_key] = reverse.reverse(api_view_urls[api_view_key].name, request=request, format=format)
+                return response.Response(ret)
+
+        return APIRoot.as_view()
+
+update_router = HybridRouter()
 update_router.register(r'collection', views.CollectionUpdateViewSet)
 update_router.register(r'topic', views.TopicUpdateViewSet)
 update_router.register(r'interest', views.InterestUpdateViewSet)
 update_router.register(r'feed', views.ResourceContainerViewSet)
+update_router.add_api_view('files', url(r'^files/$', views.AddFile.as_view(), name='files'))
 
 urlpatterns += patterns('',
     url(r'search/', views.ResourceSearch.as_view()),    

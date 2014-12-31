@@ -319,3 +319,17 @@ class InterestUpdateSerializer(serializers.HyperlinkedModelSerializer):
         model = Resource
         url_field_name = 'topic'
         fields = ('interest_hontza', 'interest_social', 'interest_resource')        
+
+#######################################################################
+# Upload files
+#######################################################################
+
+class AssetSerializer(serializers.ModelSerializer):
+
+    link = serializers.SerializerMethodField('get_absolute_url')
+    def get_absolute_url(self, obj):
+        return obj.source.url
+
+    class Meta:
+        model = File     
+        fields = ('collection', 'name', 'source')   

@@ -1,5 +1,7 @@
 #-*- coding: UTF-8 -*-
 
+from django.utils.translation import ugettext_lazy as _
+
 from django.db import models
 from taggit.managers import TaggableManager
 from redactor.fields import RedactorField
@@ -145,6 +147,15 @@ class Collection(models.Model):
     status = models.IntegerField(default=ADDED, choices=COL_STATUS)
     resources = models.ManyToManyField(Resource, null=True, blank=True, related_name="collection")
     feeds = models.ManyToManyField(ResourceContainer, null=True, blank=True, related_name="collection")
+
+    def __unicode__(self):
+        return self.name
+
+class File(models.Model):
+    collection = models.ForeignKey(Collection,related_name="files",)
+    name = models.CharField(max_length=255,null=True, blank=True)
+    descripcion = RedactorField(null=True, blank=True)
+    source = models.FileField(_('file'), upload_to='uploads',)
 
     def __unicode__(self):
         return self.name
