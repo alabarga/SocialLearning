@@ -11,6 +11,10 @@ import django_filters
 from django_filters.fields import Lookup
 from rest_framework.parsers import MultiPartParser, FormParser
 
+
+# curl -X POST http://127.0.0.1:8000/update/files/ -F "name=mi otro archivo" -F "collection=1" -F "source=@/home/alabarga/Downloads/social.jpg;type=image/jpeg" -H "Content-Type: multipart/form-data" 
+# curl -X POST http://social.hontza.net/update/files/ -F "name=mi otro archivo" -F "collection=1" -F "source=@/home/alabarga/Downloads/social.jpg;type=image/jpeg" -H "Content-Type: multipart/form-data" 
+
 class AddFile(APIView):
     queryset = File.objects.all()
     serializer_class = AssetSerializer
@@ -43,6 +47,10 @@ class AddFile(APIView):
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, format=None):
+        serializer = AssetSerializer(self.queryset, many=True)
+        return Response(serializer.data)
 
 #curl -X POST 127.0.0.1:8000/update/files/ -d '{"name" = "my image   ","source"="/home/alabarga/Downloads/social.jpg"}' -H "Content-Type: application/json"
 
