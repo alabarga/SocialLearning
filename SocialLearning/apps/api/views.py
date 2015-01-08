@@ -13,7 +13,15 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 
 # curl -X POST http://127.0.0.1:8000/update/files/ -F "name=mi otro archivo" -F "collection=1" -F "source=@/home/alabarga/Downloads/social.jpg;type=image/jpeg" -H "Content-Type: multipart/form-data" 
-# curl -X POST http://social.hontza.net/update/files/ -F "name=mi otro archivo" -F "collection=1" -F "source=@/home/alabarga/Downloads/social.jpg;type=image/jpeg" -H "Content-Type: multipart/form-data" 
+# curl -X POST http://social.hontza.es/update/files/ -F "name=mi otro archivo" -F "collection=1" -F "source=@/home/alabarga/Downloads/social.jpg;type=image/jpeg" -H "Content-Type: multipart/form-data" 
+
+class FileInstanceView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Returns a single author.
+    Also allows updating and deleting
+    """
+    model = File
+    serializer_class = AssetSerializer
 
 class AddFile(APIView):
     queryset = File.objects.all()

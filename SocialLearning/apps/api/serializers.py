@@ -332,4 +332,4 @@ class AssetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = File     
-        fields = ('collection', 'name', 'source')   
+        fields = ('id','collection', 'name', 'source')   

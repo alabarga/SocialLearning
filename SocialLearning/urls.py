@@ -46,14 +46,7 @@ urlpatterns = patterns('',
 from rest_framework import routers
 from api import views
 
-router = routers.DefaultRouter()
-router.register(r'resources', views.ResourceViewSet)
-router.register(r'collections', views.CollectionViewSet)
-router.register(r'mentions', views.MentionViewSet)
-router.register(r'profiles', views.ProfileViewSet)
-router.register(r'topics', views.TopicViewSet)
-router.register(r'relevance', views.RelevanceViewSet)
-router.register(r'feeds', views.ResourceContainerViewSet)
+
 
 #router.register(r'noticias', views.ResourceSearch, base_name='noticias')
 
@@ -106,12 +99,24 @@ class HybridRouter(routers.DefaultRouter):
 
         return APIRoot.as_view()
 
+
+router = HybridRouter()
+router.register(r'resources', views.ResourceViewSet)
+router.register(r'collections', views.CollectionViewSet)
+router.register(r'mentions', views.MentionViewSet)
+router.register(r'profiles', views.ProfileViewSet)
+router.register(r'topics', views.TopicViewSet)
+router.register(r'relevance', views.RelevanceViewSet)
+router.register(r'feeds', views.ResourceContainerViewSet)
+
 update_router = HybridRouter()
 update_router.register(r'collection', views.CollectionUpdateViewSet)
 update_router.register(r'topic', views.TopicUpdateViewSet)
 update_router.register(r'interest', views.InterestUpdateViewSet)
 update_router.register(r'feed', views.ResourceContainerViewSet)
 update_router.add_api_view('files', url(r'^files/$', views.AddFile.as_view(), name='files'))
+
+router.add_api_view('files', url(r'^files/(?P<pk>[\d]+)/$', views.FileInstanceView.as_view(), name='file-instance'))
 
 urlpatterns += patterns('',
     url(r'search/', views.ResourceSearch.as_view()),    
