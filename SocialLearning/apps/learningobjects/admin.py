@@ -4,15 +4,20 @@ from django.contrib import admin
 
 from learningobjects.models import *
 
-class ResourceInline(admin.TabularInline):
+class ResourceInline(admin.StackedInline):
     model = Collection.resources.through
 
-class TopicInline(admin.TabularInline):
+class TopicInline(admin.StackedInline):
     model = Topic
+    extra = 0
+
+class FilesInline(admin.StackedInline):
+    model = File
+    extra = 0
 
 class CollectionAdmin(admin.ModelAdmin):
     filter_horizontal = ("resources",)
-    inlines = [ TopicInline, ]
+    inlines = [ TopicInline, FilesInline]
 
 class ResourceAdmin(admin.ModelAdmin):
     list_display = ("identifier","title")

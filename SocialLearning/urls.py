@@ -49,8 +49,6 @@ from api import views
 
 
 #router.register(r'noticias', views.ResourceSearch, base_name='noticias')
-
-
 #http://social.hontza.es/update/topic/", 
 #http://social.hontza.es/update/collection/", 
 #http://social.hontza.es/update/interest/"
@@ -114,9 +112,9 @@ update_router.register(r'collection', views.CollectionUpdateViewSet)
 update_router.register(r'topic', views.TopicUpdateViewSet)
 update_router.register(r'interest', views.InterestUpdateViewSet)
 update_router.register(r'feed', views.ResourceContainerViewSet)
-update_router.add_api_view('files', url(r'^files/$', views.AddFile.as_view(), name='files'))
 
-router.add_api_view('files', url(r'^files/(?P<pk>[\d]+)/$', views.FileInstanceView.as_view(), name='file-instance'))
+update_router.add_api_view('files', url(r'^files/$', views.AddFile.as_view(), name='files'))
+update_router.add_api_view('file-instance',url(r'^files/(?P<pk>[\d]+)/$', views.FileInstanceView.as_view(), name='file-instance'))
 
 urlpatterns += patterns('',
     url(r'search/', views.ResourceSearch.as_view()),    
