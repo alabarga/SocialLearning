@@ -11,6 +11,9 @@ from suit_redactor.widgets import RedactorWidget
 import feedparser
 from datetime import datetime
 
+from learningobjects.utils.search import *
+from learningobjects.utils.parsers import *
+
 class SocialNetwork(models.Model):
     name = models.CharField(max_length=255)
     descripcion = RedactorField(null=True, blank=True)
@@ -209,11 +212,12 @@ class Resource(models.Model):
                 self.content_type = 'WEB'
 
             else:
-                res.status=Resource.UNKOWN
+                self.status=Resource.UNKOWN
 
         except:
-            res.status=Resource.ERROR
-        res.save()
+            self.status=Resource.ERROR
+
+        self.save()
 
 class Collection(models.Model):
 

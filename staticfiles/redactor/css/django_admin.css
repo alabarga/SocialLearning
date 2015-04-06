@@ -1,0 +1,24 @@
+.redactor_box { 
+  max-width: 769px;
+  float: left;
+  width: 100%;
+}
+body .redactor_box_fullscreen{ max-width: none; }
+.redactor_box textarea, .redactor_box iframe, .redactor_.redactor_editor { min-height: 300px; }
+
+#redactor_tabs { padding-left: 0; }
+
+.field-content label { display: none; }
+
+.redactor_box li,
+.redactor_toolbar li {
+    font-size: 14px;
+}
+.form-row .redactor_box p {
+    font-size: 14px;
+    margin-left: 0;
+    padding-left: 0;
+}
+form .redactor_box ul {
+    margin-left: 0;
+}

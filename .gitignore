@@ -34,6 +34,9 @@ node_modules/
 # migrations
 migrations/
 
-# local configuration
+# media
+SocialLearning/media/
+
+## local configuration
 SocialLearning/config/local.py
 SocialLearning/wsgi.py
