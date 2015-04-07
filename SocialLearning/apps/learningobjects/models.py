@@ -13,6 +13,15 @@ from datetime import datetime
 
 from learningobjects.utils.search import *
 from learningobjects.utils.parsers import *
+from utils.social import ShareCount
+from learningobjects import tasks
+
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete, post_save
+
+@receiver(post_save, sender=Resource)
+def resource_post_save(sender, instance, created, **kwargs):
+    tasks.describe.delay(instance.pk)
 
 class SocialNetwork(models.Model):
     name = models.CharField(max_length=255)
@@ -126,6 +135,11 @@ class Resource(models.Model):
         else:
             return self.title
 
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.identifier = hashlib.md5(self.url).hexdigest() # sha1        
+        super(Resource, self).save(*args, **kwargs)
+
     @property
     def interest(self):
         return self._interest
@@ -145,14 +159,19 @@ class Resource(models.Model):
     def find_mentions(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.identifier = hashlib.md5(self.url).hexdigest() # sha1
-        super(Resource, self).save(*args, **kwargs)
+    @property
+    def clean_url(self):
+        engine=SearchEngine("none")
+        url=engine.clean(self.url)
+        return url
 
     @property
     def topic_list(self):
         return [t.name for t in self.relevant.all()]
+
+    @property
+    def sharecount(self):
+        return ShareCount(self.url)
 
     def describe(self):
         try:

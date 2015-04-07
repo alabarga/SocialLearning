@@ -26,6 +26,11 @@ class dotdict(dict):
     __setattr__= dict.__setitem__
     __delattr__= dict.__delitem__
 
+def ShareCount(url):
+    response=urllib2.urlopen("http://count.donreach.com/?url="+url)        
+    data=json.loads(response.read())
+    return data["shares"]["total"]
+
 class SocialNetworkAPI(object):
 
     def __init__(self, name):
@@ -51,6 +56,8 @@ class Twitter(SocialNetworkAPI):
 
     def __init__(self):
 
+        name = "Twitter"
+        url = "http://twitter.com/"
         #####TWITTER KEYS#####
         CONSUMER_KEY = 'ieZUZgZrSJJE0QLBBOsgXg'
         CONSUMER_SECRET = 'PlIpSrh6unKYZISSDieBIFAB3D9f6aSh4p4Dmcn8Q'
@@ -65,6 +72,8 @@ class Twitter(SocialNetworkAPI):
 
         super(Twitter, self).__init__("twitter")
 
+    def profile_url(username):
+        return "http://twitter.com/"+str(username)
     def get_followers_count(self, user):
         res=self.api.get_user(user).followers_count
         return res
@@ -143,13 +152,11 @@ class Twitter(SocialNetworkAPI):
 
         return tags
         
-    def get_expand(url,user,tag,):
+    def get_expand(url,user,tag):
         tagl=[]
         tagl.append(str(tag))
         relatedToTweet=[]        
 
-        print"----------------------------"
-        print "En twitter para el usuario "+user+" y tag "+str(tag)+": "
         response=twittApi.user_timeline(screen_name=user,count=10)
         for tweet in response:
             ht=extract_hash_tags(tweet.text)           
@@ -170,10 +177,7 @@ class Twitter(SocialNetworkAPI):
                         if feed: 
                             rc=ResourceContainer.objects.get_or_create(rss=feed,url=link)
                             add_feed(feed)
-        print "__________________________"
-        print ""
-      
-
+     
 # code: b4d2325534966ff16094e19d5b23146a
 # clientId: 4269302d99c97fd93d143d78bd7c4592
 # secret: e6965b38674a3bcc9223783c01d638bf
@@ -197,6 +201,7 @@ class Delicious(SocialNetworkAPI):
 
     def __init__(self):
 
+        name = "Delicious"
         username = 'hontza'
         password = 'h0ntza14'
         clientId = 'ff0d2d6d04af32ec405708f3e50addab'
@@ -229,10 +234,8 @@ class Delicious(SocialNetworkAPI):
         mentions = []
         if result['pkg']:
             for t in result['pkg']:
-                status_url = ''
-
                 mention = {
-                 'url': status_url,
+                 'url': url,
                  'username': t['username'],
                  'text': t['note'],
                  'count': 0,
@@ -242,28 +245,46 @@ class Delicious(SocialNetworkAPI):
 
         return mentions
         
-
-    def get_expand(url,user,tag,social_network):
+    def get_related(url):
         tagl=[]
         tagl.append(str(tag))
-        relatedToTweet=[]        
-        # https://avosapi.delicious.com/api/v1/posts/public/alabarga/time?tag=hontza
-        # http://feeds.delicious.com/v2/json/tag/3dprinting
-        # http://feeds.delicious.com/v2/json/alabarga/hontza
-        print"----------------------------"  
-        print "En delicious para el usuario "+user+" y tag "+str(tag)+": "
-        url_to_call="http://feeds.delicious.com/v2/json/"+str(user)+"/"+urllib2.quote(str(tag),'') 
-        response=urllib2.urlopen(url_to_call)
-        response=json.loads(response.read())
-        for res in response:
-            if url!=str(res["u"]):
-                print str(res["u"])
-                print "Fecha: "+res["dt"]
-                call_command('add',URL=str(res["u"]))
-                feed=feedfinder.feed(str(res["u"]))
-                if feed:
-                    rc=ResourceContainer.objects.get_or_create(rss=feed,url=str(res["u"]))
-                    add_feed(feed)
-        print "__________________________"
-        print ""     
 
+        #related/links
+
+        # https://avosapi.delicious.com/api/v1/posts/public/alabarga/time?tag=hontza
+        api_url = 'https://avosapi.delicious.com/api/v1/posts/related/links?md5=%s' % self.get_md5(url)      
+        response=urllib2.urlopen(api_url)
+        response=json.loads(response.read())
+
+        urls = []
+        if result['pkg']:
+            for t in result['pkg']:                
+                urls.append(t['url'])
+
+        return urls
+
+    def get_expand(url,user,tag):
+        tagl=[]
+        tagl.append(str(tag))
+
+        # https://avosapi.delicious.com/api/v1/posts/public/alabarga/time?tag=hontza
+        api_url = 'https://avosapi.delicious.com/api/v1/posts/public/%s/time?tag=%s' % (user, tag)        
+        response=urllib2.urlopen(api_url)
+        response=json.loads(response.read())
+
+        result = deli.apiRequestDelicious(self.token,'posts/public/'+self.get_md5(url))
+        result = json.loads(result)
+
+        mentions = []
+        if result['pkg']:
+            for t in result['pkg']:
+                mention = {
+                 'url': t['url'],
+                 'username': user,
+                 'text': t['title'],
+                 'count': 0,
+                 'tags': t['tags']
+                }
+                mentions.append(dotdict(mention))
+
+        return mentions
